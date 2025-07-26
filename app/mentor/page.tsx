@@ -146,9 +146,11 @@ export default function AdminPage() {
 
   return (
     <main className="bg-white dark:bg-[#0f172a] min-h-screen">
-      {/* Import the dashboard component */}
-      <MentorDashboard mentor={currentMentor} onLogout={handleLogout} />
+      {currentMentor && (
+        <MentorDashboard mentor={currentMentor} onLogout={handleLogout} />
+      )}
     </main>
+
   );
 }
 
