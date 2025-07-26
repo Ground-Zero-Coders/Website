@@ -101,7 +101,7 @@ export default function Navbar() {
                 ADMIN
               </Link>
               <Link
-                href="/mentor-portal"
+                href="/mentor"
                 className="block bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-2 rounded-full font-medium text-center mt-2"
                 onClick={() => setIsOpen(false)}
               >
