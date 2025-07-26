@@ -51,9 +51,10 @@ export default function AdminPage() {
     return (
       <>
       <Navbar />
-      <main className="bg-white dark:bg-[#0f172a] min-h-screen flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#00bcd4]/5 dark:from-[#14b8a6]/5 to-transparent"></div>
-        
+      <main className="bg-black min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Optional glowing background blur (can remove if too bright) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-transparent blur-3xl pointer-events-none"></div>
+
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
