@@ -140,7 +140,7 @@ export default function AdminDashboardPage() {
 
   return (
     <main className="bg-white dark:bg-[#0f172a] min-h-screen">
-      <AdminDashboard admin={currentAdmin} onLogout={handleLogout} />
+      {currentAdmin && <AdminDashboard admin={currentAdmin} onLogout={handleLogout} />}
     </main>
   );
 }
