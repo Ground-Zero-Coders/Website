@@ -2,27 +2,28 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, ExternalLink,Building2 } from 'lucide-react';
 
 const upcomingEvents = [
+
   {
-    title: 'AI/ML Hackathon 2024',
-    date: '2024-02-15',
-    location: 'Tech Hub',
-    participants: '200+',
-  },
-  {
-    title: 'Web Development Workshop',
-    date: '2024-02-28',
+    title: 'Code veda hack',
+    date: 'will be released soon ',
     location: 'Online',
-    participants: '150+',
+    participants: 'External ',
   },
   {
-    title: 'Open Source Contribution Drive',
-    date: '2024-03-10',
-    location: 'Campus',
-    participants: '100+',
+    title: 'Ideathon ',
+    date: 'will be released soon',
+    location: 'online',
+    participants: 'Internal',
   },
+  {
+    title: 'Quiz challenge ',
+    date: 'will be released soon',
+    location: 'online',
+    participants: 'Internal',
+  },  
 ];
 
 export default function HeroSection() {
@@ -74,7 +75,7 @@ export default function HeroSection() {
     e.preventDefault();
     if (validateForm()) {
       // Redirect to Google Form with pre-filled data
-      const googleFormUrl = `https://docs.google.com/forms/d/e/1FAIpQLSe_placeholder_form_id/viewform?usp=pp_url&entry.123456789=${encodeURIComponent(formData.name)}&entry.987654321=${encodeURIComponent(formData.email)}`;
+      const googleFormUrl = `https://forms.gle/9o2hBaV3NZ9bPjmo6`;
       window.open(googleFormUrl, '_blank');
     }
   };
@@ -130,8 +131,8 @@ export default function HeroSection() {
                       <span>{event.location}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm sm:text-base">
-                      <Users className="h-4 w-4 text-accent" />
-                      <span>{event.participants} Expected</span>
+                      <Building2 className="h-5 w-5 text-green-500" /> 
+                      <span>{event.participants} Event</span>
                     </div>
                   </div>
                 </motion.div>

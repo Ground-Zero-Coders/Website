@@ -115,10 +115,10 @@ export default function LandingPage() {
                   className="space-y-4"
                 >
                   {[
-                    "Premier tech organization since 2023",
+                    "Premier tech organization since June 2025",
                     "500+ active developers and designers",
-                    "150+ innovative projects completed",
-                    "25+ successful hackathons organized",
+                    "25+ innovative projects completed",
+                    "5+ successful hackathons organized",
                   ].map((item, i) => (
                     <div key={i} className="flex items-center space-x-3 text-gray-300">
                       <ChevronRight className="h-5 w-5 text-cyan-400" />

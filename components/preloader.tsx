@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Code } from 'lucide-react';
+import { Code2 } from 'lucide-react';
 
 export default function Preloader() {
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +52,7 @@ export default function Preloader() {
               className="mb-8"
             >
               <div className="relative">
-                <Code className="h-16 w-16 text-[#00bcd4] dark:text-[#14b8a6] mx-auto" />
+                <Code2 className="h-16 w-16 text-[#00bcd4] dark:text-[#14b8a6] mx-auto" />
                 <motion.div
                   animate={{ 
                     scale: [1, 1.2, 1],

@@ -79,14 +79,8 @@ export default function Footer() {
           Contact Info
         </h3>
         <div className="space-y-3 text-gray-400">
-          <div className="flex items-center space-x-3">
-            <MapPin className="h-5 w-5 text-cyan-400" />
-            <span>Tech Campus, Innovation District</span>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Phone className="h-5 w-5 text-cyan-400" />
-            <span>+1 (555) 123-4567</span>
-          </div>
+
+
           <div className="flex items-center space-x-3">
             <Mail className="h-5 w-5 text-cyan-400" />
             <span>contact@groundzerocoders.org</span>
@@ -95,24 +89,7 @@ export default function Footer() {
       </div>
 
       {/* Newsletter */}
-      <div>
-        <h3 className="font-space-grotesk font-semibold text-lg text-white mb-6">
-          Stay Updated
-        </h3>
-        <p className="text-gray-400 mb-4">
-          Subscribe to our newsletter for the latest updates and events.
-        </p>
-        <div className="flex">
-          <input
-            type="email"
-            placeholder="Enter your email"
-            className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-l-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-cyan-400 transition-all"
-          />
-          <button className="bg-cyan-500 text-black px-6 py-2 rounded-r-lg hover:scale-105 transition-transform duration-300 font-semibold">
-            Subscribe
-          </button>
-        </div>
-      </div>
+
     </div>
 
     {/* Bottom */}

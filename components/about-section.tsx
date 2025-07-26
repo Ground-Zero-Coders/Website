@@ -88,7 +88,8 @@ export default function AboutSection() {
                     transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
                     className="group"
                   >
-                    <div className="bg-transparent border border-custom p-4 rounded-xl hover:border-accent transition-all duration-300 hover:shadow-lg">
+                    <div className="bg-transparent border border-custom p-4 rounded-xl hover:border-accent transition-all duration-300 hover:shadow-lg flex flex-col justify-between min-h-[180px]">
+
                       <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-accent mb-3 group-hover:scale-110 transition-transform duration-300" />
                       <h3 className="font-space-grotesk font-semibold text-primary mb-1 text-sm sm:text-base">
                         {feature.title}
@@ -112,9 +113,9 @@ export default function AboutSection() {
           >
             <div className="relative z-10 rounded-3xl p-2 border border-gray-200 dark:border-gray-700">
               <img
-                src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
+                src="/file.jpg"
                 alt="Team collaboration"
-                className="w-full h-80 object-cover rounded-2xl shadow-lg"
+                className="w-full h-90 object-cover rounded-2xl shadow-lg"
               />
             </div>
           </motion.div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Code } from 'lucide-react';
+import { Menu, X, Code2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
@@ -23,7 +23,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
             <div className="relative">
-              <Code className="h-8 w-8 text-cyan-400 group-hover:scale-110 transition-transform duration-300" />
+              <Code2 className="h-8 w-8 text-cyan-400 group-hover:scale-110 transition-transform duration-300" />
               <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-lg group-hover:blur-xl transition-all duration-300"></div>
             </div>
             <span className="font-space-grotesk font-bold text-xl text-white">
