@@ -1,4 +1,4 @@
-export interface Feedback {
+export interface ExtendedFeedback {
   id: string;
   mentorId: string;
   mentorName: string;
@@ -11,7 +11,7 @@ export interface Feedback {
   submittedAt: string;
 }
 
-export const feedbackData: Feedback[] = [
+export const feedbackData: ExtendedFeedback[] = [
   {
     id: 'fb-001',
     mentorId: 'mentor-001',

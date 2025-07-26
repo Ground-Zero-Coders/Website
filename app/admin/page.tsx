@@ -5,7 +5,10 @@ import { motion } from 'framer-motion';
 import { Shield, User, Lock, Eye, EyeOff, Plus, MessageSquare, FolderPlus, Users, Calendar, Settings, LogOut } from 'lucide-react';
 import { feedbackService, projectService, mentorService, type Feedback, type Project, type Mentor } from '@/lib/supabase';
 import { authenticateAdmin, type AdminCredentials } from '@/data/adminAuth';
-import { feedbackData } from '@/data/feedback';
+import { feedbackData, ExtendedFeedback } from '@/data/feedback';
+
+
+
 import Navbar from '@/components/navbar'; 
 
 export default function AdminDashboardPage() {
@@ -335,7 +338,7 @@ function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
 
 // Feedback Panel Content
 function FeedbackPanelContent() {
-  const [feedback, setFeedback] = useState<Feedback[]>(feedbackData);
+const [feedback, setFeedback] = useState<ExtendedFeedback[]>(feedbackData);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
