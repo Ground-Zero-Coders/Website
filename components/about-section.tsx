@@ -35,11 +35,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white dark:bg-[#0f172a] relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-[#00bcd4]/5 dark:bg-[#14b8a6]/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#00bcd4]/10 dark:bg-[#14b8a6]/10 rounded-full blur-3xl"></div>
-      
+    <section id="about" className="py-20 relative">
       <div ref={ref} className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Side - Content */}
@@ -58,7 +54,7 @@ export default function AboutSection() {
               >
                 About Ground Zero Coders
               </motion.h2>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
                 animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -66,9 +62,7 @@ export default function AboutSection() {
                 className="text-muted text-base lg:text-lg leading-relaxed mb-6 lg:mb-8"
               >
                 Ground Zero Coders is a premier tech organization dedicated to fostering innovation, 
-                collaboration, and excellence in software development. We bring together passionate 
-                developers, designers, and tech enthusiasts to create cutting-edge solutions and 
-                build the future of technology.
+                collaboration, and excellence in software development.
               </motion.p>
 
               <motion.p
@@ -78,8 +72,7 @@ export default function AboutSection() {
                 className="text-muted text-base lg:text-lg leading-relaxed"
               >
                 Our mission is to empower the next generation of technologists through mentorship, 
-                hands-on projects, and a supportive community that encourages continuous learning 
-                and professional growth.
+                hands-on projects, and a supportive community.
               </motion.p>
             </div>
 
@@ -95,7 +88,7 @@ export default function AboutSection() {
                     transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
                     className="group"
                   >
-                    <div className="bg-card/50 backdrop-blur-sm p-4 rounded-xl border border-custom hover:border-accent transition-all duration-300 hover:shadow-lg">
+                    <div className="bg-transparent border border-custom p-4 rounded-xl hover:border-accent transition-all duration-300 hover:shadow-lg">
                       <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-accent mb-3 group-hover:scale-110 transition-transform duration-300" />
                       <h3 className="font-space-grotesk font-semibold text-primary mb-1 text-sm sm:text-base">
                         {feature.title}
@@ -117,50 +110,12 @@ export default function AboutSection() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="relative"
           >
-            <div className="relative">
-              {/* Main Image */}
-              <div className="relative z-10 bg-gradient-to-br from-[#00bcd4]/10 to-[#00bcd4]/5 dark:from-[#14b8a6]/10 dark:to-[#14b8a6]/5 rounded-3xl p-8 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-                <img
-                  src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
-                  alt="Team collaboration"
-                  className="w-full h-80 object-cover rounded-2xl shadow-2xl"
-                />
-              </div>
-
-              {/* Floating Elements */}
-              <motion.div
-                animate={{ 
-                  y: [0, -10, 0],
-                  rotate: [0, 5, 0]
-                }}
-                transition={{ 
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-                className="absolute -top-4 -right-4 bg-[#00bcd4] dark:bg-[#14b8a6] text-white p-4 rounded-2xl shadow-xl z-20"
-              >
-                <Code className="h-8 w-8" />
-              </motion.div>
-
-              <motion.div
-                animate={{ 
-                  y: [0, 10, 0],
-                  rotate: [0, -5, 0]
-                }}
-                transition={{ 
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  delay: 1
-                }}
-                className="absolute -bottom-4 -left-4 bg-white dark:bg-gray-800 text-[#00bcd4] dark:text-[#14b8a6] p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 z-20"
-              >
-                <Users className="h-8 w-8" />
-              </motion.div>
-
-              {/* Background Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#00bcd4]/20 to-transparent dark:from-[#14b8a6]/20 rounded-3xl blur-2xl"></div>
+            <div className="relative z-10 rounded-3xl p-2 border border-gray-200 dark:border-gray-700">
+              <img
+                src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
+                alt="Team collaboration"
+                className="w-full h-80 object-cover rounded-2xl shadow-lg"
+              />
             </div>
           </motion.div>
         </div>

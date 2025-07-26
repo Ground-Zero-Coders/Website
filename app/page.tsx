@@ -15,7 +15,7 @@ export default function Home() {
       <LandingPage />
       <HeroSection />
       <AboutSection />
-      <StatsSection />
+      
       <CoreTeamSection />
       <TopPerformersSection />
       <ProjectsPreview />

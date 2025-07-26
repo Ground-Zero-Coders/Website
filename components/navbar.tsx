@@ -1,19 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/contexts/theme-context';
-import { Menu, X, Sun, Moon, Code } from 'lucide-react';
+import { Menu, X, Code } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { isDark, toggleTheme } = useTheme();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -50,20 +43,6 @@ export default function Navbar() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
             ))}
-            
-            {/* Theme Toggle */}
-            {mounted && (
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-800/50 hover:bg-cyan-500/10 transition-colors duration-300 border border-gray-700"
-              >
-                {isDark ? (
-                  <Sun className="h-5 w-5 text-gray-300" />
-                ) : (
-                  <Moon className="h-5 w-5 text-gray-300" />
-                )}
-              </button>
-            )}
 
             {/* Admin Button */}
             <Link
@@ -72,7 +51,7 @@ export default function Navbar() {
             >
               ADMIN
             </Link>
-            
+
             {/* Mentor Button */}
             <Link
               href="/mentor"
@@ -84,18 +63,6 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            {mounted && (
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-lg bg-gray-800/50 hover:bg-cyan-500/10 transition-colors duration-300 border border-gray-700"
-              >
-                {isDark ? (
-                  <Sun className="h-5 w-5 text-gray-300" />
-                ) : (
-                  <Moon className="h-5 w-5 text-gray-300" />
-                )}
-              </button>
-            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-primary hover:text-accent transition-colors duration-300"
