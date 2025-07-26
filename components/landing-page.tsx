@@ -59,7 +59,7 @@ export default function LandingPage() {
   const stats = [
     { label: 'Active Members', value: '500+', icon: Users },
     { label: 'Projects Completed', value: `${projectCount}+`, icon: Code },
-    { label: 'Hackathons Organized', value: '25+', icon: Trophy },
+    { label: 'Hackathons Organized', value: '5+', icon: Trophy },
   ];
 
     return (
