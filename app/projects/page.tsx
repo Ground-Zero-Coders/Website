@@ -42,15 +42,17 @@ export default function ProjectsPage() {
 
     fetchProjects();
   }, []);
+const filteredProjects = projects.filter(project => {
+  const matchesSearch =
+    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (project.description?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+    project.mentor.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         project.mentor.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || project.group === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  const matchesCategory = selectedCategory === 'All' || project.group === selectedCategory;
+
+  return matchesSearch && matchesCategory;
+});
+
 
   return (
     <main className="bg-background min-h-screen">
