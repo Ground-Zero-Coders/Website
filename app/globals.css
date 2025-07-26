@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #ffffff;
+    --color-secondary: #14b8a6;
+    --color-accent: #06b6d4;
+    --color-background: #000000;
+    --color-card: #111827;
+    --color-muted: #9ca3af;
+    --color-custom: #374151;
+  }
+
+  .dark {
+    --color-primary: #ffffff;
+    --color-secondary: #06b6d4;
+    --color-accent: #06b6d4;
+    --color-background: #000000;
+    --color-card: #0f172a;
+    --color-muted: #64748b;
+    --color-custom: #1e293b;
+  }
+
+  .font-inter {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .font-space-grotesk {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .text-primary {
+    color: var(--color-primary);
+  }
+
+  .text-secondary {
+    color: var(--color-secondary);
+  }
+
+  .text-muted {
+    color: var(--color-muted);
+  }
+
+  .text-accent {
+    color: var(--color-accent);
+  }
+
+  .bg-background {
+    background-color: var(--color-background);
+  }
+
+  .bg-card {
+    background-color: var(--color-card);
+  }
+
+  .bg-accent {
+    background-color: var(--color-accent);
+  }
+
+  .border-custom {
+    border-color: var(--color-custom);
+  }
+
+  .bg-secondary\/10 {
+    background-color: rgb(from var(--color-secondary) r g b / 0.1);
+  }
+
+  .bg-secondary\/20 {
+    background-color: rgb(from var(--color-secondary) r g b / 0.2);
+  }
+
+  .bg-secondary\/30 {
+    background-color: rgb(from var(--color-secondary) r g b / 0.3);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Responsive text sizes */
+  @media (max-width: 640px) {
+    .responsive-text-4xl {
+      font-size: 2rem;
+      line-height: 2.5rem;
+    }
+    
+    .responsive-text-3xl {
+      font-size: 1.875rem;
+      line-height: 2.25rem;
+    }
+    
+    .responsive-text-2xl {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#00bcd4] dark:bg-[#14b8a6];
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.8;
+}
+
+/* Background grid pattern */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.dark .bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Matte black gradients */
+.bg-matte-black {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+}
+
+.bg-matte-dark {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1f1f1f 50%, #0a0a0a 100%);
+}
+
+.bg-matte-card {
+  background: linear-gradient(135deg, #111111 0%, #1e1e1e 50%, #111111 100%);
+}
+
+/* Enhanced scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-cyan-500/50;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cyan-500/70;
+}
+
+/* Glass morphism effects */
+.glass-effect {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.glass-card {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
