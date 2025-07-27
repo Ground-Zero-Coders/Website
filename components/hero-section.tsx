@@ -5,26 +5,29 @@ import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, ExternalLink,Building2 } from 'lucide-react';
 
 const upcomingEvents = [
-
   {
-    title: 'Code veda hack',
-    date: 'will be released soon ',
+    title: 'Code Veda Hackathon',
+    date: 'Coming Soon',
+    location: 'Online/Offline',
+    participants: 'External',
+    link: 'https://forms.gle/abc123VEDA'
+  },
+  {
+    title: 'Ideathon',
+    date: 'Coming Soon',
     location: 'Online',
-    participants: 'External ',
+    participants: 'Internal',
+    link: 'https://forms.gle/xyz456IDEA'
   },
   {
-    title: 'Ideathon ',
-    date: 'will be released soon',
-    location: 'online',
+    title: 'Quiz Challenge',
+    date: 'Coming Soon',
+    location: 'Online',
     participants: 'Internal',
-  },
-  {
-    title: 'Quiz challenge ',
-    date: 'will be released soon',
-    location: 'online',
-    participants: 'Internal',
-  },  
+    link: 'https://forms.gle/qwe789QUIZ'
+  }
 ];
+
 
 export default function HeroSection() {
   const [formData, setFormData] = useState({
@@ -117,24 +120,35 @@ export default function HeroSection() {
                   <h3 className="font-space-grotesk font-semibold text-lg sm:text-xl text-primary mb-3 group-hover:text-accent transition-colors">
                     {event.title}
                   </h3>
-                  <div className="space-y-2 text-muted">
+                  <div className="space-y-2 text-muted mb-4">
                     <div className="flex items-center space-x-2 text-sm sm:text-base">
                       <Calendar className="h-4 w-4 text-accent" />
-                      <span>{new Date(event.date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}</span>
+                        <span>{event.date}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm sm:text-base">
                       <MapPin className="h-4 w-4 text-accent" />
                       <span>{event.location}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm sm:text-base">
-                      <Building2 className="h-5 w-5 text-green-500" /> 
+                      <Building2 className="h-5 w-5 text-green-500" />
                       <span>{event.participants} Event</span>
                     </div>
                   </div>
+
+                  <div className="flex justify-end">
+                    <a
+                    href={event.link}
+
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-accent text-white rounded-full text-sm font-medium shadow hover:shadow-lg hover:scale-105 transition-all duration-300"
+                    >
+                      <span>Register Now</span>
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+
+
                 </motion.div>
               ))}
             </div>
