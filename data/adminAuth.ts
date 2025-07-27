@@ -8,24 +8,24 @@ export interface AdminCredentials {
 
 export const adminCredentials: AdminCredentials[] = [
   {
-    adminId: 'admin-001',
-    password: 'admin2024',
-    name: 'System Administrator',
-    email: 'admin@groundzerocoders.org',
-    role: 'super_admin'
+    adminId: 'admin1',
+    password: 'admin1',
+    name: 'test',
+    email: 'test',
+    role: 'test_admin'
   },
   {
-    adminId: 'admin-002',
-    password: 'gzc2024',
-    name: 'Tech Admin',
+    adminId: 'admin2',
+    password: 'admin2',
+    name: 'test',
     email: 'tech.admin@groundzerocoders.org',
-    role: 'admin'
+    role: 'tester'
   },
   {
     adminId: 'Harsimran7765',
     password: 'Hr626264',
-    name: 'Dr. Sarah Johnson',
-    email: 'sarah.johnson@groundzerocoders.org',
+    name: 'Harsimran Singh',
+    email: 'HarsimranSingh7765@gmail.com',
     role: 'admin'
   }
 ];
