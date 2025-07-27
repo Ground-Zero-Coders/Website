@@ -306,18 +306,46 @@ export const menteeService = {
 
 export const adminService = {
   async authenticate(adminId: string, password: string): Promise<Admin | null> {
-    // For now, use hardcoded admin credentials
-    if (adminId === 'admin-001' && password === 'admin2024') {
-      return {
-        id: 'admin-001',
-        password: 'admin2024',
-        name: 'System Administrator',
-        email: 'admin@groundzerocoders.org',
-        role: 'admin',
-        created_at: new Date().toISOString()
-      };
+    const { data, error } = await supabase
+      .from('admins')
+      .select('*')
+      .eq('id', adminId)
+      .eq('password', password)
+      .single();
+
+    if (error || !data) {
+      return null;
     }
-    return null;
+
+    return data;
+  },
+
+  async getAll(): Promise<Admin[]> {
+    const { data, error } = await supabase
+      .from('admins')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching admins:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async getById(id: string): Promise<Admin | null> {
+    const { data, error } = await supabase
+      .from('admins')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data;
   }
 };
 

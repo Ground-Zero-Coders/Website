@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Shield, User, Lock, Eye, EyeOff, ExternalLink } from 'lucide-react';
+import { Shield, User, Lock, Eye, EyeOff, ExternalLink, Menu, X } from 'lucide-react';
 import { mentorService, projectService, menteeService, type Mentor, type Project, type Mentee } from '@/lib/supabase';
 import { mentorResources, type Resource } from '@/data/resources';
 import Navbar from '@/components/navbar'; 
@@ -158,18 +158,29 @@ export default function AdminPage() {
 // Mentor Dashboard Component
 function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () => void }) {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen bg-white dark:bg-[#0f172a]">
+    <div className="flex h-screen bg-white dark:bg-[#0f172a] overflow-hidden">
       {/* Sidebar */}
-      <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+      <div className={`${sidebarOpen ? 'w-64' : 'w-16'} transition-all duration-300 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative`}>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute -right-3 top-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-full p-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors z-10 shadow-md"
+        >
+          {sidebarOpen ? <X className="h-4 w-4 text-gray-600 dark:text-gray-300" /> : <Menu className="h-4 w-4 text-gray-600 dark:text-gray-300" />}
+        </button>
+
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center space-x-3">
             <Shield className="h-8 w-8 text-[#00bcd4] dark:text-[#14b8a6]" />
-            <div>
-              <h2 className="font-space-grotesk font-bold text-black dark:text-white">Mentor Portal</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{mentor.name}</p>
-            </div>
+            {sidebarOpen && (
+              <div>
+                <h2 className="font-space-grotesk font-bold text-black dark:text-white">Mentor Portal</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{mentor.name}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -191,9 +202,10 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
                   ? 'bg-[#00bcd4] dark:bg-[#14b8a6] text-white'
                   : 'text-gray-600 dark:text-gray-400 hover:text-[#00bcd4] dark:hover:text-[#14b8a6] hover:bg-[#00bcd4]/10 dark:hover:bg-[#14b8a6]/10'
               }`}
+              title={!sidebarOpen ? item.label : ''}
             >
               <span>{item.icon}</span>
-              <span className="font-medium">{item.label}</span>
+              {sidebarOpen && <span className="font-medium">{item.label}</span>}
             </button>
           ))}
         </nav>
@@ -202,26 +214,27 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={onLogout}
-            className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium"
+            className={`w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center ${sidebarOpen ? 'justify-center' : 'justify-center'}`}
+            title={!sidebarOpen ? 'Logout' : ''}
           >
-            Logout
+            {sidebarOpen ? 'Logout' : '🚪'}
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto min-w-0">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
           <div className="bg-gradient-to-r from-[#00bcd4]/10 to-[#00bcd4]/5 dark:from-[#14b8a6]/10 dark:to-[#14b8a6]/5 p-4 rounded-lg mb-4">
-            <h1 className="font-space-grotesk text-xl font-bold text-[#00bcd4] dark:text-[#14b8a6]">
+            <h1 className="font-space-grotesk text-lg md:text-xl font-bold text-[#00bcd4] dark:text-[#14b8a6]">
               Welcome, {mentor.name}! 👋
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm">
               Ready to mentor and inspire the next generation of coders?
             </p>
           </div>
-          <h2 className="font-space-grotesk text-2xl font-bold text-black dark:text-white">
+          <h2 className="font-space-grotesk text-xl md:text-2xl font-bold text-black dark:text-white">
             {activeTab === 'dashboard' && 'Dashboard'}
             {activeTab === 'teams' && 'My Mentees'}
             {activeTab === 'projects' && 'My Projects'}
@@ -233,7 +246,7 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {activeTab === 'dashboard' && <DashboardContent mentor={mentor} />}
           {activeTab === 'teams' && <TeamsContent mentor={mentor} />}
           {activeTab === 'projects' && <ProjectsContent mentor={mentor} />}
@@ -949,7 +962,7 @@ function FeedbackContent({ mentor }: { mentor: Mentor }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-[#00bcd4] dark:bg-[#14b8a6] text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full bg-[#00bcd4] dark:bg-[#14b8a6] text-white py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Submit Weekly Feedback
           </motion.button>

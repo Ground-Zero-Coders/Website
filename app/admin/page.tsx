@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, User, Lock, Eye, EyeOff, Plus, MessageSquare, FolderPlus, Users, Calendar, Settings, LogOut } from 'lucide-react';
+import { Shield, User, Lock, Eye, EyeOff, Plus, MessageSquare, FolderPlus, Users, Calendar, Settings, LogOut, Menu, X } from 'lucide-react';
 import { feedbackService, projectService, mentorService, menteeService, type Feedback, type Project, type Mentor, type Mentee } from '@/lib/supabase';
-import { authenticateAdmin, type AdminCredentials } from '@/data/adminAuth';
+import { adminService, type Admin } from '@/lib/supabase';
 import { feedbackData, ExtendedFeedback } from '@/data/feedback';
 
 
@@ -13,7 +13,7 @@ import Navbar from '@/components/navbar';
 
 export default function AdminDashboardPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentAdmin, setCurrentAdmin] = useState<AdminCredentials | null>(null);
+  const [currentAdmin, setCurrentAdmin] = useState<Admin | null>(null);
   const [loginData, setLoginData] = useState({
     adminId: '',
     password: '',
@@ -28,7 +28,7 @@ export default function AdminDashboardPage() {
     setIsLoading(true);
 
     try {
-      const admin = authenticateAdmin(loginData.adminId, loginData.password);
+      const admin = await adminService.authenticate(loginData.adminId, loginData.password);
 
       if (admin) {
         setCurrentAdmin(admin);
@@ -157,20 +157,31 @@ export default function AdminDashboardPage() {
 }
 
 // Admin Dashboard Component
-function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout: () => void }) {
+function AdminDashboard({ admin, onLogout }: { admin: Admin; onLogout: () => void }) {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="flex h-screen bg-black">
+    <div className="flex h-screen bg-black overflow-hidden">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900/50 backdrop-blur-sm border-r border-gray-800 flex flex-col">
+      <div className={`${sidebarOpen ? 'w-64' : 'w-16'} transition-all duration-300 bg-gray-900/50 backdrop-blur-sm border-r border-gray-800 flex flex-col relative`}>
+        {/* Toggle Button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="absolute -right-3 top-6 bg-gray-800 border border-gray-700 rounded-full p-1.5 hover:bg-gray-700 transition-colors z-10"
+        >
+          {sidebarOpen ? <X className="h-4 w-4 text-white" /> : <Menu className="h-4 w-4 text-white" />}
+        </button>
+
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center space-x-3">
             <Shield className="h-8 w-8 text-red-400" />
-            <div>
-              <h2 className="font-space-grotesk font-bold text-white">Admin Portal</h2>
-              <p className="text-sm text-gray-400">{admin.name}</p>
-            </div>
+            {sidebarOpen && (
+              <div>
+                <h2 className="font-space-grotesk font-bold text-white">Admin Portal</h2>
+                <p className="text-sm text-gray-400">{admin.name}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -195,10 +206,15 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
                   ? 'text-gray-400 cursor-not-allowed'
                   : 'text-gray-400 hover:text-red-400 hover:bg-red-500/10'
               }`}
+              title={!sidebarOpen ? item.label : ''}
             >
               <span>{item.icon}</span>
-              <span className="font-medium">{item.label}</span>
-              {item.disabled && <span className="text-xs">(Soon)</span>}
+              {sidebarOpen && (
+                <>
+                  <span className="font-medium">{item.label}</span>
+                  {item.disabled && <span className="text-xs">(Soon)</span>}
+                </>
+              )}
             </button>
           ))}
         </nav>
@@ -207,27 +223,28 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
         <div className="p-4 border-t border-gray-800">
           <button
             onClick={onLogout}
-            className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center justify-center space-x-2"
+            className={`w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-colors font-medium flex items-center ${sidebarOpen ? 'justify-center space-x-2' : 'justify-center'}`}
+            title={!sidebarOpen ? 'Logout' : ''}
           >
             <LogOut className="h-4 w-4" />
-            <span>Logout</span>
+            {sidebarOpen && <span>Logout</span>}
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto min-w-0">
         {/* Header */}
-        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-6">
+        <div className="bg-gray-900/50 backdrop-blur-sm border-b border-gray-800 p-4 md:p-6">
           <div className="bg-gradient-to-r from-red-500/10 to-red-600/5 p-4 rounded-lg mb-4">
-            <h1 className="font-space-grotesk text-xl font-bold text-red-400">
+            <h1 className="font-space-grotesk text-lg md:text-xl font-bold text-red-400">
               Welcome, {admin.name}! 🛡️
             </h1>
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-400 text-xs md:text-sm">
               Manage Ground Zero Coders with full administrative control
             </p>
           </div>
-          <h2 className="font-space-grotesk text-2xl font-bold text-white">
+          <h2 className="font-space-grotesk text-xl md:text-2xl font-bold text-white">
             {activeTab === 'dashboard' && 'Admin Dashboard'}
             {activeTab === 'feedback' && 'Feedback Panel'}
             {activeTab === 'projects' && 'Project Manager'}
@@ -239,7 +256,7 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           {activeTab === 'dashboard' && <AdminDashboardContent admin={admin} />}
           {activeTab === 'feedback' && <FeedbackPanelContent />}
           {activeTab === 'projects' && <ProjectManagerContent />}
@@ -254,7 +271,7 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
 }
 
 // Admin Dashboard Content
-function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
+function AdminDashboardContent({ admin }: { admin: Admin }) {
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalMentors: 0,
