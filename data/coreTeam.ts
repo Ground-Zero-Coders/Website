@@ -12,7 +12,7 @@ export const coreTeam: CoreTeamMember[] = [
     id: 'ct-001',
     name: 'Shivansh Saxena',
     position: 'President',
-    image: 'Shivansh.jpg',
+    image: 'shivansh.jpg',
   },
   {
     id: 'ct-002',
@@ -23,7 +23,7 @@ export const coreTeam: CoreTeamMember[] = [
   {
     id: 'ct-003',
     name: 'Aryan Tripathi',
-    position: 'Tech cse Head',
+    position: 'Tech CSE Head',
     image: 'https://images.pexels.com/photos/2182970/pexels-photo-2182970.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
    },
   {
@@ -41,13 +41,13 @@ export const coreTeam: CoreTeamMember[] = [
    {
     id: 'ct-006',
     name: 'Arein Jain',
-    position: 'PR & Marketing',
+    position: 'PR & Marketing Head',
     image: 'https://images.pexels.com/photos/1181693/pexels-photo-1181693.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
   },
   {
     id: 'ct-006',
     name: 'Aarav Jai',
-    position: 'Design Head',
+    position: 'Design & Creative Head',
     image: 'https://images.pexels.com/photos/1181693/pexels-photo-1181693.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
     },
    {
