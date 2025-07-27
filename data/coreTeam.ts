@@ -10,7 +10,7 @@ export interface CoreTeamMember {
 export const coreTeam: CoreTeamMember[] = [
   {
     id: 'ct-001',
-    name: 'Alex Johnson',
+    name: 'Shivansh Saxena',
     position: 'President',
     image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
     email: 'alex.johnson@groundzerocoders.org',
