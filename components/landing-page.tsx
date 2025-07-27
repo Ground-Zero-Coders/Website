@@ -117,7 +117,7 @@ export default function LandingPage() {
   {[
     "Premier tech organization since June 2025",
     "500+ active developers and designers",
-    `${projectCount} + innovative projects completed`,
+    `${projectCount}+ innovative projects completed`,
     "5+ successful hackathons organized",
   ].map((item, i) => (
     <div key={i} className="flex items-center space-x-3 text-gray-300">
