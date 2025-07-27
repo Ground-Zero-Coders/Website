@@ -4,6 +4,8 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import { ThemeProvider } from '@/contexts/theme-context';
 import Preloader from '@/components/preloader';
 
+
+
 const inter = Inter({ 
   subsets: ['latin'], 
   variable: '--font-inter',
@@ -20,6 +22,9 @@ export const metadata: Metadata = {
   title: 'Ground Zero Coders - Tech Organization',
   description: 'A premier tech organization fostering innovation, collaboration, and excellence in software development.',
   keywords: 'tech organization, coding, hackathons, projects, mentorship',
+  icons: {
+    icon: '/android-chrome-512x512.png', 
+  },
 };
 
 export default function RootLayout({

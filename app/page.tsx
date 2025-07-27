@@ -8,6 +8,11 @@ import TopPerformersSection from '@/components/top-performers-section';
 import ProjectsPreview from '@/components/projects-preview';
 import Footer from '@/components/footer';
 
+
+
+
+
+
 export default function Home() {
   return (
     <main className="bg-black">
