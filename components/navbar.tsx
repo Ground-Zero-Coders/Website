@@ -9,11 +9,11 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '#about' },
-    { name: 'Team', href: '#team' },
+    { name: 'Home', href: '/' }, 
+    { name: 'About', href: '/#about' },
+    { name: 'Team', href: '/#team' },
     { name: 'Projects', href: '/projects' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Contact', href: '/#contact' },
   ];
 
   return (
