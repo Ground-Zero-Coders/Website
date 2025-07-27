@@ -10,7 +10,7 @@ const upcomingEvents = [
     date: 'Coming Soon',
     location: 'Online/Offline',
     participants: 'External',
-    link: 'https://forms.gle/abc123VEDA'
+    link: 'https://vision.hack2skill.com/event/codeveda/?utm_source=google.com&utm_medium=Referral&utm_campaign=RevantJain'
   },
   {
     title: 'Ideathon',

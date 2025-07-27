@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Code, Github, Linkedin, Twitter, Mail, MapPin, Phone } from 'lucide-react';
+import { Code, Github, Linkedin, MessageCircle, Mail, MapPin, Phone } from 'lucide-react';
+import { FaWhatsapp,FaInstagram } from 'react-icons/fa';
 
 export default function Footer() {
   const socialLinks = [
     { icon: Github, href: '#', label: 'GitHub' },
     { icon: Linkedin, href: '#', label: 'LinkedIn' },
-    { icon: Twitter, href: '#', label: 'Twitter' },
+    { icon: FaWhatsapp, href: 'https://chat.whatsapp.com/Ehvmi4sPlu12xGBQHusxHl', label: 'Whatsapp Community' },
     { icon: Mail, href: 'mailto:contact@groundzerocoders.org', label: 'Email' },
+    { icon: FaInstagram, href: 'mailto:contact@groundzerocoders.org', label: '' },
   ];
 
   const quickLinks = [
