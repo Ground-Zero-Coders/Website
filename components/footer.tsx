@@ -7,11 +7,11 @@ import { FaWhatsapp,FaInstagram } from 'react-icons/fa';
 
 export default function Footer() {
   const socialLinks = [
-    { icon: Github, href: '#', label: 'GitHub' },
-    { icon: Linkedin, href: '#', label: 'LinkedIn' },
+    { icon: Github, href: 'www.github.com/Ground-Zero-Coders', label: 'GitHub' },
+    // { icon: Linkedin, href: '#', label: 'LinkedIn' },
     { icon: FaWhatsapp, href: 'https://chat.whatsapp.com/Ehvmi4sPlu12xGBQHusxHl', label: 'Whatsapp Community' },
-    { icon: Mail, href: 'mailto:contact@groundzerocoders.org', label: 'Email' },
-    { icon: FaInstagram, href: 'mailto:contact@groundzerocoders.org', label: '' },
+    { icon: Mail, href: 'groundzerocoders@gmail.com', label: 'Email' },
+    { icon: FaInstagram, href: 'https://www.instagram.com/groundzerocoders', label: 'Instagram' },
   ];
 
   const quickLinks = [
