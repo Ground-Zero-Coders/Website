@@ -11,7 +11,7 @@ export interface TopPerformer {
 export const topPerformers: TopPerformer[] = [
   {
     id: 'tp-001',
-    name: 'Harsimaran Singh',
+    name: 'Harsimran Singh',
     group: 'GZC',
     domain: 'Full Stack Development',
     image: '/harsimran.jpg',
@@ -29,7 +29,7 @@ export const topPerformers: TopPerformer[] = [
   },
   {
     id: 'tp-003',
-    name: 'Utakarsh Shukla',
+    name: 'Utkarsh Gupta',
     group: 'GZC',
     domain: 'Cyber Security',
     image: '/utkarsh.jpg',
