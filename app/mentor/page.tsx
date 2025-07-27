@@ -269,7 +269,7 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
           {activeTab === 'teams' && <TeamsContent mentor={mentor} />}
           {activeTab === 'projects' && <ProjectsContent mentor={mentor} />}
           {activeTab === 'add-project' && <AddProjectContent mentor={mentor} />}
-          {activeTab === 'updates' && <UpdatesContent />}
+          {/* {activeTab === 'updates' && <UpdatesContent />} */}
           {activeTab === 'resources' && <ResourcesContent />}
           {activeTab === 'feedback' && <FeedbackContent mentor={mentor} />}
         </div>
