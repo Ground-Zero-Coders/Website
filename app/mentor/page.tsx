@@ -17,7 +17,21 @@ export default function AdminPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+
+  // Check for existing login on component mount
+  useEffect(() => {
+    const savedMentor = localStorage.getItem('mentorSession');
+    if (savedMentor) {
+      try {
+        const mentorData = JSON.parse(savedMentor);
+        setCurrentMentor(mentorData);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error parsing saved mentor session:', error);
+        localStorage.removeItem('mentorSession');
+      }
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +44,8 @@ export default function AdminPage() {
       if (mentor) {
         setCurrentMentor(mentor);
         setIsLoggedIn(true);
+        // Save mentor session to localStorage
+        localStorage.setItem('mentorSession', JSON.stringify(mentor));
       } else {
         setLoginError('Invalid Mentor ID or Password');
       }
@@ -45,6 +61,8 @@ export default function AdminPage() {
     setIsLoggedIn(false);
     setCurrentMentor(null);
     setLoginData({ mentorId: '', password: '' });
+    // Remove mentor session from localStorage
+    localStorage.removeItem('mentorSession');
   };
 
   if (!isLoggedIn) {
@@ -475,6 +493,7 @@ return (
 // Add Project Content
 function AddProjectContent({ mentor }: { mentor: Mentor }) {
   const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -503,6 +522,34 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
     fetchMentees();
   }, [mentor.id]);
 
+  const handleMenteeSelection = (menteeId: string, menteeName: string) => {
+    if (selectedMentees.includes(menteeId)) {
+      // Remove mentee
+      const updatedMentees = selectedMentees.filter(id => id !== menteeId);
+      setSelectedMentees(updatedMentees);
+      
+      // Update form data
+      const menteeNames = updatedMentees.map(id => {
+        const mentee = mentees.find(m => m.id === id);
+        return mentee ? mentee.name : '';
+      }).filter(name => name);
+      
+      setFormData({ ...formData, mentee: menteeNames.join(', ') });
+    } else {
+      // Add mentee
+      const updatedMentees = [...selectedMentees, menteeId];
+      setSelectedMentees(updatedMentees);
+      
+      // Update form data
+      const menteeNames = updatedMentees.map(id => {
+        const mentee = mentees.find(m => m.id === id);
+        return mentee ? mentee.name : '';
+      }).filter(name => name);
+      
+      setFormData({ ...formData, mentee: menteeNames.join(', ') });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -524,6 +571,7 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
           occasion: '',
           status: 'completed'
         });
+        setSelectedMentees([]);
       } else {
         alert('Failed to create project. Please try again.');
       }
@@ -571,30 +619,54 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
 
           <div>
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
-              Mentee(s) *
+              Select Mentee(s) *
             </label>
-            <select
-              value={formData.mentee}
-              onChange={(e) => setFormData({ ...formData, mentee: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
-              required
-            >
-              <option value="">Select mentee(s)</option>
-              {mentees.map((mentee) => (
-                <option key={mentee.id} value={mentee.name}>
-                  {mentee.name} ({mentee.domain})
-                </option>
-              ))}
-              <option value="custom">Enter custom names</option>
-            </select>
-            {formData.mentee === 'custom' && (
+            <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
+              {mentees.length === 0 ? (
+                <p className="text-gray-500 text-sm">No mentees available</p>
+              ) : (
+                mentees.map((mentee) => (
+                  <label key={mentee.id} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 p-2 rounded">
+                    <input
+                      type="checkbox"
+                      checked={selectedMentees.includes(mentee.id)}
+                      onChange={() => handleMenteeSelection(mentee.id, mentee.name)}
+                      className="w-4 h-4 text-[#00bcd4] dark:text-[#14b8a6] border-gray-300 dark:border-gray-600 rounded focus:ring-[#00bcd4] dark:focus:ring-[#14b8a6]"
+                    />
+                    <span className="text-black dark:text-white text-sm">
+                      {mentee.name} ({mentee.domain || 'No domain'})
+                    </span>
+                  </label>
+                ))
+              )}
+            </div>
+            
+            {/* Show selected mentees */}
+            {selectedMentees.length > 0 && (
+              <div className="mt-2 p-2 bg-[#00bcd4]/10 dark:bg-[#14b8a6]/10 rounded border">
+                <p className="text-sm font-medium text-black dark:text-white mb-1">Selected Mentees:</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{formData.mentee}</p>
+              </div>
+            )}
+            
+            {/* Option to add custom mentees */}
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                Or enter custom mentee names (comma separated)
+              </label>
               <input
                 type="text"
-                placeholder="Enter mentee names (comma separated)"
-                onChange={(e) => setFormData({ ...formData, mentee: e.target.value })}
+                placeholder="John Doe, Jane Smith"
+                onChange={(e) => {
+                  const customNames = e.target.value;
+                  if (customNames.trim()) {
+                    setFormData({ ...formData, mentee: customNames });
+                    setSelectedMentees([]); // Clear selected mentees when using custom input
+                  }
+                }}
                 className="w-full mt-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
               />
-            )}
+            </div>
           </div>
 
           <div>
