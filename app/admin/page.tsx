@@ -722,16 +722,18 @@ function MenteeManagerContent() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingMentee, setEditingMentee] = useState<Mentee | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    group_name: '',
-    mentor_id: '',
-    mentor_name: '',
-    domain: '',
-    github_id: '',
-    status: 'active'
-  });
+const [formData, setFormData] = useState({
+  name: '',
+  email: '',
+  group_name: '',
+  mentor_id: '',
+  mentor_name: '',
+  domain: '',
+  github_id: '',
+  status: 'active',
+  join_date: new Date().toISOString().split("T")[0], // 👈 This adds today's date in YYYY-MM-DD
+});
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -762,6 +764,8 @@ function MenteeManagerContent() {
           alert('Mentee updated successfully!');
         }
       } else {
+        formData.join_date = new Date().toISOString().split("T")[0]; // adds today in 'YYYY-MM-DD' format
+
         const newMentee = await menteeService.create(formData);
         if (newMentee) {
           setMentees([newMentee, ...mentees]);
@@ -775,20 +779,22 @@ function MenteeManagerContent() {
     }
   };
 
-  const handleEdit = (mentee: Mentee) => {
-    setEditingMentee(mentee);
-    setFormData({
-      name: mentee.name,
-      email: mentee.email,
-      group_name: mentee.group_name || '',
-      mentor_id: mentee.mentor_id || '',
-      mentor_name: mentee.mentor_name || '',
-      domain: mentee.domain || '',
-      github_id: mentee.github_id || '',
-      status: mentee.status
-    });
-    setShowForm(true);
-  };
+const handleEdit = (mentee: Mentee) => {
+  setEditingMentee(mentee);
+  setFormData({
+    name: mentee.name,
+    email: mentee.email,
+    group_name: mentee.group_name || '',
+    mentor_id: mentee.mentor_id || '',
+    mentor_name: mentee.mentor_name || '',
+    domain: mentee.domain || '',
+    github_id: mentee.github_id || '',
+    status: mentee.status,
+    join_date: mentee.join_date || new Date().toISOString().split("T")[0] // 👈 Important
+  });
+  setShowForm(true);
+};
+
 
   const handleDelete = async (mentee: Mentee) => {
     if (confirm(`Are you sure you want to delete ${mentee.name}?`)) {
@@ -811,20 +817,22 @@ function MenteeManagerContent() {
     });
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      email: '',
-      group_name: '',
-      mentor_id: '',
-      mentor_name: '',
-      domain: '',
-      github_id: '',
-      status: 'active'
-    });
-    setEditingMentee(null);
-    setShowForm(false);
-  };
+const resetForm = () => {
+  setFormData({
+    name: '',
+    email: '',
+    group_name: '',
+    mentor_id: '',
+    mentor_name: '',
+    domain: '',
+    github_id: '',
+    status: 'active',
+    join_date: new Date().toISOString().split("T")[0]  // 👈 today's date as default
+  });
+  setEditingMentee(null);
+  setShowForm(false);
+};
+
 
   if (loading) {
     return (
