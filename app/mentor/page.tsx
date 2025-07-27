@@ -190,7 +190,7 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
             { id: 'teams', label: 'My Mentees', icon: '' },
             { id: 'projects', label: 'Projects', icon: '' },
             { id: 'add-project', label: 'Add Project', icon: '' },
-            { id: 'updates', label: 'Updates', icon: '' },
+            // { id: 'updates', label: 'Updates', icon: '' },
             { id: 'resources', label: 'Resources', icon: '' },
             { id: 'feedback', label: 'Feedback', icon: '' },
           ].map((item) => (
@@ -239,7 +239,7 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
             {activeTab === 'teams' && 'My Mentees'}
             {activeTab === 'projects' && 'My Projects'}
             {activeTab === 'add-project' && 'Add New Project'}
-            {activeTab === 'updates' && 'Updates & Meetings'}
+            {/* {activeTab === 'updates' && 'Updates & Meetings'} */}
             {activeTab === 'resources' && 'Resources'}
             {activeTab === 'feedback' && 'Weekly Feedback'}
           </h2>
@@ -702,62 +702,62 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
   );
 }
 
-// Updates Content
-function UpdatesContent() {
-  // For now, show placeholder updates since we don't have updates table yet
-  const updates = [
-    {
-      id: 'update-001',
-      title: 'Weekly Mentor-Core Team Sync',
-      date: '2024-02-28',
-      time: '10:00 AM',
-      description: 'Regular sync meeting to discuss mentee progress and upcoming projects',
-      priority: 'high',
-      location: 'Conference Room A',
-      participants: ['Core Team', 'All Mentors']
-    },
-    {
-      id: 'update-002',
-      title: 'Project Submission Deadline',
-      date: '2024-03-05',
-      time: '11:59 PM',
-      description: 'Final submission deadline for Q1 2024 projects',
-      priority: 'high'
-    }
-  ];
+// // Updates Content
+// function UpdatesContent() {
+//   // For now, show placeholder updates since we don't have updates table yet
+//   const updates = [
+//     {
+//       id: 'update-001',
+//       title: 'Weekly Mentor-Core Team Sync',
+//       date: '2024-02-28',
+//       time: '10:00 AM',
+//       description: 'Regular sync meeting to discuss mentee progress and upcoming projects',
+//       priority: 'high',
+//       location: 'Conference Room A',
+//       participants: ['Core Team', 'All Mentors']
+//     },
+//     {
+//       id: 'update-002',
+//       title: 'Project Submission Deadline',
+//       date: '2024-03-05',
+//       time: '11:59 PM',
+//       description: 'Final submission deadline for Q1 2024 projects',
+//       priority: 'high'
+//     }
+//   ];
 
-  return (
-    <div className="space-y-4">
-      {updates.map((update: any) => (
-        <div key={update.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="flex items-start justify-between mb-3">
-            <h3 className="font-space-grotesk text-lg font-semibold text-black dark:text-white">
-              {update.title}
-            </h3>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              update.priority === 'high' ? 'bg-red-100 text-red-800' :
-              update.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-green-100 text-green-800'
-            }`}>
-              {update.priority}
-            </span>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-3">{update.description}</p>
-          <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <span> {new Date(update.date).toLocaleDateString()}</span>
-            <span> {update.time}</span>
-            {update.location && <span>📍 {update.location}</span>}
-          </div>
-          {update.participants && (
-            <div className="mt-2 text-sm text-gray-500">
-              <strong>Participants:</strong> {update.participants.join(', ')}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
+//   return (
+//     <div className="space-y-4">
+//       {updates.map((update: any) => (
+//         <div key={update.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+//           <div className="flex items-start justify-between mb-3">
+//             <h3 className="font-space-grotesk text-lg font-semibold text-black dark:text-white">
+//               {update.title}
+//             </h3>
+//             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+//               update.priority === 'high' ? 'bg-red-100 text-red-800' :
+//               update.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+//               'bg-green-100 text-green-800'
+//             }`}>
+//               {update.priority}
+//             </span>
+//           </div>
+//           <p className="text-gray-600 dark:text-gray-400 mb-3">{update.description}</p>
+//           <div className="flex items-center space-x-4 text-sm text-gray-500">
+//             <span> {new Date(update.date).toLocaleDateString()}</span>
+//             <span> {update.time}</span>
+//             {update.location && <span>📍 {update.location}</span>}
+//           </div>
+//           {update.participants && (
+//             <div className="mt-2 text-sm text-gray-500">
+//               <strong>Participants:</strong> {update.participants.join(', ')}
+//             </div>
+//           )}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// }
 
 // Resources Content
 function ResourcesContent() {
