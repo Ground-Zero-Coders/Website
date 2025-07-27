@@ -495,6 +495,8 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [selectedMentees, setSelectedMentees] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     github: '',
@@ -612,62 +614,54 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
               type="url"
               value={formData.github}
               onChange={(e) => setFormData({ ...formData, github: e.target.value })}
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-white dark:text-white"
               placeholder="https://github.com/..."
             />
           </div>
+<div>
+  <label className="block text-sm font-medium text-black dark:text-white mb-2">
+    Select Mentee(s) *
+  </label>
 
-          <div>
-            <label className="block text-sm font-medium text-black dark:text-white mb-2">
-              Select Mentee(s) *
-            </label>
-            <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
-              {mentees.length === 0 ? (
-                <p className="text-gray-500 text-sm">No mentees available</p>
-              ) : (
-                mentees.map((mentee) => (
-                  <label key={mentee.id} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 p-2 rounded">
-                    <input
-                      type="checkbox"
-                      checked={selectedMentees.includes(mentee.id)}
-                      onChange={() => handleMenteeSelection(mentee.id, mentee.name)}
-                      className="w-4 h-4 text-[#00bcd4] dark:text-[#14b8a6] border-gray-300 dark:border-gray-600 rounded focus:ring-[#00bcd4] dark:focus:ring-[#14b8a6]"
-                    />
-                    <span className="text-black dark:text-white text-sm">
-                      {mentee.name} ({mentee.domain || 'No domain'})
-                    </span>
-                  </label>
-                ))
-              )}
-            </div>
-            
-            {/* Show selected mentees */}
-            {selectedMentees.length > 0 && (
-              <div className="mt-2 p-2 bg-[#00bcd4]/10 dark:bg-[#14b8a6]/10 rounded border">
-                <p className="text-sm font-medium text-black dark:text-white mb-1">Selected Mentees:</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">{formData.mentee}</p>
-              </div>
-            )}
-            
-            {/* Option to add custom mentees */}
-            <div className="mt-3">
-              <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                Or enter custom mentee names (comma separated)
-              </label>
+  <div className="relative">
+    <button
+      type="button"
+      onClick={() => setShowDropdown(!showDropdown)}
+      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-left flex justify-between items-center focus:outline-none text-white"
+    >
+      {selectedMentees.length > 0 ? `${selectedMentees.length} selected` : 'Select Mentees'}
+      <svg className="w-4 h-4 ml-2" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M10 14l-6-6h12l-6 6z" />
+      </svg>
+    </button>
+
+    {showDropdown && (
+      <div className="absolute z-50 w-full mt-1 max-h-64 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg p-3">
+        {mentees.length === 0 ? (
+          <p className="text-sm text-muted">No mentees available</p>
+        ) : (
+          mentees.map((mentee) => (
+            <label
+              key={mentee.id}
+              className="flex items-center space-x-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
               <input
-                type="text"
-                placeholder="John Doe, Jane Smith"
-                onChange={(e) => {
-                  const customNames = e.target.value;
-                  if (customNames.trim()) {
-                    setFormData({ ...formData, mentee: customNames });
-                    setSelectedMentees([]); // Clear selected mentees when using custom input
-                  }
-                }}
-                className="w-full mt-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+                type="checkbox"
+                checked={selectedMentees.includes(mentee.id)}
+                onChange={() => handleMenteeSelection(mentee.id, mentee.name)}
+                className="w-4 h-4 text-accent border-gray-300 rounded"
               />
-            </div>
-          </div>
+              <span className="text-sm text-black dark:text-white">
+                {mentee.name} ({mentee.domain || 'No domain'})
+              </span>
+            </label>
+          ))
+        )}
+      </div>
+    )}
+  </div>
+</div>
+
 
           <div>
             <label className="block text-sm font-medium text-black dark:text-white mb-2">
