@@ -18,7 +18,7 @@ export const coreTeam: CoreTeamMember[] = [
     id: 'ct-002',
     name: 'Sankalp Shukla',
     position: 'Vice President',
-    image: '/sankalp2.jpg',
+    image: '/sankalp.jpg',
    },
   {
     id: 'ct-003',
