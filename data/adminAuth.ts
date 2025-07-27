@@ -22,8 +22,8 @@ export const adminCredentials: AdminCredentials[] = [
     role: 'admin'
   },
   {
-    adminId: 'mentor-001',
-    password: 'sarah2024',
+    adminId: 'Harsimran7765',
+    password: 'Hr626264',
     name: 'Dr. Sarah Johnson',
     email: 'sarah.johnson@groundzerocoders.org',
     role: 'admin'

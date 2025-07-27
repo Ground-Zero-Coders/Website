@@ -175,13 +175,13 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
 
         <nav className="p-4 space-y-2 flex-1">
           {[
-            { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-            { id: 'teams', label: 'My Mentees', icon: '👥' },
-            { id: 'projects', label: 'Projects', icon: '🚀' },
-            { id: 'add-project', label: 'Add Project', icon: '➕' },
-            { id: 'updates', label: 'Updates', icon: '📅' },
-            { id: 'resources', label: 'Resources', icon: '📚' },
-            { id: 'feedback', label: 'Feedback', icon: '💬' },
+            { id: 'dashboard', label: 'Dashboard', icon: '' },
+            { id: 'teams', label: 'My Mentees', icon: '' },
+            { id: 'projects', label: 'Projects', icon: '' },
+            { id: 'add-project', label: 'Add Project', icon: '' },
+            { id: 'updates', label: 'Updates', icon: '' },
+            { id: 'resources', label: 'Resources', icon: '' },
+            { id: 'feedback', label: 'Feedback', icon: '' },
           ].map((item) => (
             <button
               key={item.id}
@@ -247,33 +247,33 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
   );
 }
 
-// Dashboard Content
 function DashboardContent({ mentor }: { mentor: Mentor }) {
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-black dark:text-white mb-2">Total Teams</h3>
-          <p className="text-3xl font-bold text-[#00bcd4] dark:text-[#14b8a6]">4</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-black dark:text-white mb-2">Active Projects</h3>
-          <p className="text-3xl font-bold text-[#00bcd4] dark:text-[#14b8a6]">6</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-black dark:text-white mb-2">Mentees</h3>
-          <p className="text-3xl font-bold text-[#00bcd4] dark:text-[#14b8a6]">16</p>
-        </div>
+        {[
+          { title: 'Total Teams', count: 4 },
+          { title: 'Active Projects', count: 6 },
+          { title: 'Mentees', count: 16 }
+        ].map((item, i) => (
+          <div
+            key={i}
+            className="bg-gray-900 p-6 rounded-xl border border-gray-700"
+          >
+            <h3 className="font-semibold text-white mb-2">{item.title}</h3>
+            <p className="text-3xl font-bold text-[#14b8a6]">{item.count}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-        <h3 className="font-space-grotesk text-xl font-semibold text-black dark:text-white mb-4">
+      <div className="bg-gray-900 p-6 rounded-xl border border-gray-700">
+        <h3 className="font-space-grotesk text-xl font-semibold text-white mb-4">
           Welcome to Your Mentor Dashboard
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-white/80 mb-4">
           Here you can manage your teams, track project progress, and stay updated with the latest announcements.
         </p>
-        <div className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm text-white">
           <p><strong>Department:</strong> {mentor.department}</p>
           <p><strong>Join Date:</strong> {new Date(mentor.join_date).toLocaleDateString()}</p>
           <p><strong>Email:</strong> {mentor.email}</p>
@@ -282,6 +282,7 @@ function DashboardContent({ mentor }: { mentor: Mentor }) {
     </div>
   );
 }
+
 
 // Teams Content
 function TeamsContent({ mentor }: { mentor: Mentor }) {
@@ -311,57 +312,65 @@ function TeamsContent({ mentor }: { mentor: Mentor }) {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-space-grotesk text-xl font-semibold text-black dark:text-white">
-          My Mentees ({mentees.length})
-        </h3>
-      </div>
+ return (
+  <div className="space-y-6">
+    <div className="flex items-center justify-between">
+      <h3 className="font-space-grotesk text-xl font-semibold text-white">
+        My Mentees ({mentees.length})
+      </h3>
+    </div>
 
-      {mentees.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">No mentees assigned yet.</p>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mentees.map((mentee) => (
-            <div key={mentee.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-4 mb-4">
-                <div className="w-12 h-12 bg-[#00bcd4]/10 dark:bg-[#14b8a6]/10 rounded-full flex items-center justify-center">
-                  <span className="text-[#00bcd4] dark:text-[#14b8a6] font-semibold text-lg">
-                    {mentee.name.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-space-grotesk font-semibold text-black dark:text-white">
-                    {mentee.name}
-                  </h4>
-                  <p className="text-sm text-gray-500">{mentee.domain}</p>
-                </div>
+    {mentees.length === 0 ? (
+      <div className="text-center py-12">
+        <p className="text-white/70">No mentees assigned yet.</p>
+      </div>
+    ) : (
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {mentees.map((mentee) => (
+          <div
+            key={mentee.id}
+            className="bg-gray-900 p-6 rounded-xl border border-gray-700 text-white"
+          >
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="w-12 h-12 bg-[#14b8a6]/10 rounded-full flex items-center justify-center">
+                <span className="text-[#14b8a6] font-semibold text-lg">
+                  {mentee.name.charAt(0)}
+                </span>
               </div>
-              
-              <div className="space-y-2 text-sm">
-                <p><strong>Email:</strong> {mentee.email}</p>
-                <p><strong>Group:</strong> {mentee.group_name || 'Not assigned'}</p>
-                <p><strong>GitHub:</strong> {mentee.github_id || 'Not provided'}</p>
-                <p><strong>Join Date:</strong> {new Date(mentee.join_date).toLocaleDateString()}</p>
-                <p><strong>Status:</strong> 
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                    mentee.status === 'active' ? 'bg-green-100 text-green-800' :
-                    mentee.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {mentee.status}
-                  </span>
-                </p>
+              <div>
+                <h4 className="font-space-grotesk font-semibold text-white">
+                  {mentee.name}
+                </h4>
+                <p className="text-sm text-white/60">{mentee.domain}</p>
               </div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+
+            <div className="space-y-2 text-sm text-white/90">
+              <p><strong>Email:</strong> {mentee.email}</p>
+              <p><strong>Group:</strong> {mentee.group_name || 'Not assigned'}</p>
+              <p><strong>GitHub:</strong> {mentee.github_id || 'Not provided'}</p>
+              <p><strong>Join Date:</strong> {new Date(mentee.join_date).toLocaleDateString()}</p>
+              <p className="flex items-center">
+                <strong>Status:</strong>
+                <span
+                  className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                    mentee.status === 'active'
+                      ? 'bg-green-500/10 text-green-300'
+                      : mentee.status === 'inactive'
+                      ? 'bg-red-500/10 text-red-300'
+                      : 'bg-blue-500/10 text-blue-300'
+                  }`}
+                >
+                  {mentee.status}
+                </span>
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
 }
 
 // Projects Content
@@ -392,46 +401,62 @@ function ProjectsContent({ mentor }: { mentor: Mentor }) {
       </div>
     );
   }
+return (
+  <div className="space-y-6">
+    {projects.length === 0 ? (
+      <div className="text-center py-12">
+        <p className="text-white/70">No projects assigned yet.</p>
+      </div>
+    ) : (
+      <div className="grid md:grid-cols-2 gap-6">
+        {projects.map((project: any) => (
+          <div
+            key={project.id}
+            className="bg-gray-900 p-6 rounded-xl border border-gray-700 text-white"
+          >
+            <img
+              src={
+                project.image ||
+                'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop'
+              }
+              alt={project.name}
+              className="w-full h-32 object-cover rounded-lg mb-4 border border-gray-700"
+            />
 
-  return (
-    <div className="space-y-6">
-      {projects.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 dark:text-gray-400">No projects assigned yet.</p>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-6">
-          {projects.map((project: any) => (
-            <div key={project.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-              <img
-                src={project.image || 'https://images.pexels.com/photos/230544/pexels-photo-230544.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&fit=crop'}
-                alt={project.name}
-                className="w-full h-32 object-cover rounded-lg mb-4"
-              />
-              <h3 className="font-space-grotesk text-lg font-semibold text-black dark:text-white mb-2">
-                {project.name}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">{project.description || 'No description available'}</p>
-              <div className="space-y-1 text-sm">
-                <p><strong>Occasion:</strong> {project.occasion}</p>
-                <p><strong>Date:</strong> {new Date(project.date).toLocaleDateString()}</p>
-                <p><strong>Mentees:</strong> {project.mentee}</p>
-                <p><strong>Status:</strong> 
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                    project.status === 'completed' ? 'bg-green-100 text-green-800' :
-                    project.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-blue-100 text-blue-800'
-                  }`}>
-                    {project.status}
-                  </span>
-                </p>
-              </div>
+            <h3 className="font-space-grotesk text-lg font-semibold text-white mb-2">
+              {project.name}
+            </h3>
+
+            <p className="text-white/70 text-sm mb-3">
+              {project.description || 'No description available'}
+            </p>
+
+            <div className="space-y-1 text-sm text-white/90">
+              <p><strong>Occasion:</strong> {project.occasion}</p>
+              <p><strong>Date:</strong> {new Date(project.date).toLocaleDateString()}</p>
+              <p><strong>Mentees:</strong> {project.mentee}</p>
+              <p className="flex items-center">
+                <strong>Status:</strong>
+                <span
+                  className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
+                    project.status === 'completed'
+                      ? 'bg-green-500/10 text-green-300'
+                      : project.status === 'in-progress'
+                      ? 'bg-yellow-500/10 text-yellow-300'
+                      : 'bg-blue-500/10 text-blue-300'
+                  }`}
+                >
+                  {project.status}
+                </span>
+              </p>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
 }
 
 // Add Project Content
@@ -706,8 +731,8 @@ function UpdatesContent() {
           </div>
           <p className="text-gray-600 dark:text-gray-400 mb-3">{update.description}</p>
           <div className="flex items-center space-x-4 text-sm text-gray-500">
-            <span>📅 {new Date(update.date).toLocaleDateString()}</span>
-            <span>🕒 {update.time}</span>
+            <span> {new Date(update.date).toLocaleDateString()}</span>
+            <span> {update.time}</span>
             {update.location && <span>📍 {update.location}</span>}
           </div>
           {update.participants && (
@@ -739,67 +764,71 @@ function ResourcesContent() {
     ? mentorResources 
     : mentorResources.filter(resource => resource.category === selectedCategory);
 
-  return (
-    <div className="space-y-6">
-      {/* Category Filter */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-              selectedCategory === category.id
-                ? 'bg-accent text-white shadow-lg'
-                : 'bg-card text-muted hover:text-accent hover:bg-accent/10 border border-custom'
-            }`}
-          >
-            {category.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Resources Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredResources.map((resource) => (
-          <div key={resource.id} className="bg-card p-6 rounded-xl border border-custom shadow-sm hover:shadow-lg transition-all duration-300">
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="font-space-grotesk text-lg font-semibold text-primary mb-2 line-clamp-2">
-                {resource.title}
-              </h3>
-              <span className="text-xs text-accent font-medium bg-accent/10 px-2 py-1 rounded-full whitespace-nowrap ml-2">
-                {resource.type}
-              </span>
-            </div>
-            
-            <p className="text-muted mb-4 text-sm line-clamp-3 leading-relaxed">
-              {resource.description}
-            </p>
-            
-            <div className="flex items-center justify-between mt-auto">
-              <span className="text-xs text-muted capitalize bg-secondary/10 px-2 py-1 rounded">
-                {resource.category.replace('-', ' ')}
-              </span>
-              <a
-                href={resource.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-accent text-white px-4 py-2 rounded-lg hover:scale-105 transition-all duration-300 flex items-center space-x-2 text-sm font-medium shadow-sm hover:shadow-md"
-              >
-                <span className="hidden sm:inline">Open</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredResources.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-muted">No resources found in this category.</p>
-        </div>
-      )}
+return (
+  <div className="space-y-6">
+    {/* Category Filter */}
+    <div className="flex flex-wrap gap-2 mb-6">
+      {categories.map((category) => (
+        <button
+          key={category.id}
+          onClick={() => setSelectedCategory(category.id)}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+            selectedCategory === category.id
+              ? 'bg-[#14b8a6] text-white shadow-lg'
+              : 'bg-gray-800 text-white/70 hover:text-[#14b8a6] hover:bg-cyan-500/10 border border-gray-600'
+          }`}
+        >
+          {category.label}
+        </button>
+      ))}
     </div>
-  );
+
+    {/* Resources Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      {filteredResources.map((resource) => (
+        <div
+          key={resource.id}
+          className="bg-gray-900 p-6 rounded-xl border border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300"
+        >
+          <div className="flex items-start justify-between mb-3">
+            <h3 className="font-space-grotesk text-lg font-semibold text-white mb-2 line-clamp-2">
+              {resource.title}
+            </h3>
+            <span className="text-xs text-cyan-400 font-medium bg-cyan-500/10 px-2 py-1 rounded-full whitespace-nowrap ml-2">
+              {resource.type}
+            </span>
+          </div>
+
+          <p className="text-white/70 mb-4 text-sm line-clamp-3 leading-relaxed">
+            {resource.description}
+          </p>
+
+          <div className="flex items-center justify-between mt-auto">
+            <span className="text-xs text-white/60 capitalize bg-white/10 px-2 py-1 rounded">
+              {resource.category.replace('-', ' ')}
+            </span>
+            <a
+              href={resource.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#14b8a6] text-white px-4 py-2 rounded-lg hover:scale-105 transition-all duration-300 flex items-center space-x-2 text-sm font-medium shadow-sm hover:shadow-md"
+            >
+              <span className="hidden sm:inline">Open</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {filteredResources.length === 0 && (
+      <div className="text-center py-12">
+        <p className="text-white/60">No resources found in this category.</p>
+      </div>
+    )}
+  </div>
+);
+
 }
 
 // Feedback Content

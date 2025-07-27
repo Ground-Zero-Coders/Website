@@ -139,7 +139,7 @@ export default function AdminDashboardPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
-                Demo credentials: admin-001 / admin2024
+                Demo credentials: admin-001 / ******
               </p>
             </div>
           </div>
@@ -176,13 +176,13 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
 
         <nav className="p-4 space-y-2 flex-1">
           {[
-            { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-            { id: 'feedback', label: 'Feedback Panel', icon: '💬' },
-            { id: 'projects', label: 'Project Manager', icon: '🚀' },
-            { id: 'mentees', label: 'Mentee Manager', icon: '👥' },
-            { id: 'meetings', label: 'Meeting Scheduler', icon: '📅', disabled: true },
-            { id: 'mentors', label: 'Mentor Assignment', icon: '🎓', disabled: true },
-            { id: 'settings', label: 'Settings', icon: '⚙️', disabled: true },
+            { id: 'dashboard', label: 'Dashboard', icon: '' },
+            { id: 'feedback', label: 'Feedback Panel', icon: '' },
+            { id: 'projects', label: 'Project Manager', icon: '' },
+            { id: 'mentees', label: 'Mentee Manager', icon: '' },
+            { id: 'meetings', label: 'Meeting Scheduler', icon: '', disabled: true },
+            { id: 'mentors', label: 'Mentor Assignment', icon: '', disabled: true },
+            { id: 'settings', label: 'Settings', icon: '', disabled: true },
           ].map((item) => (
             <button
               key={item.id}
