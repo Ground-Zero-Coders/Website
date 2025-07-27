@@ -433,13 +433,13 @@ function FeedbackPanelContent() {
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <h4 className="font-space-grotesk font-semibold text-white">
-                    {item.mentorName}
+                    {item.mentor_name}
                   </h4>
-                  <p className="text-sm text-gray-500">ID: {item.mentorId}</p>
+                  <p className="text-sm text-gray-500">ID: {item.mentor_id}</p>
                 </div>
                 <div className="text-right text-sm text-gray-500">
-                  <p>Week of {new Date(item.weekOf).toLocaleDateString()}</p>
-                  <p>{new Date(item.submittedAt).toLocaleDateString()}</p>
+                  <p>Week of {new Date(item.week_of).toLocaleDateString()}</p>
+                  <p>{new Date(item.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="space-y-3 text-gray-400 text-sm">
