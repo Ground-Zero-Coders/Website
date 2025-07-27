@@ -27,8 +27,12 @@ export interface Feedback {
   id: string;
   mentor_id: string;
   mentor_name: string;
-  message: string;
   week_of: string;
+  team_progress: string;
+  challenges?: string;
+  achievements?: string;
+  next_week_plans?: string;
+  additional_notes?: string;
   created_at: string;
 }
 
@@ -351,33 +355,31 @@ export const adminService = {
 
 export const feedbackService = {
   async getAll(): Promise<Feedback[]> {
-    // For now, return mock data since we don't have feedback table yet
-    return [
-      {
-        id: 'feedback-001',
-        mentor_id: 'mentor-001',
-        mentor_name: 'Dr. Sarah Johnson',
-        message: 'Team is making excellent progress on the e-commerce project. All milestones are on track.',
-        week_of: '2024-01-15',
-        created_at: '2024-01-15T10:00:00Z'
-      },
-      {
-        id: 'feedback-002',
-        mentor_id: 'mentor-002',
-        mentor_name: 'Prof. Mike Davis',
-        message: 'AI chatbot project is challenging but the team is learning a lot. Need more time for ML model training.',
-        week_of: '2024-01-20',
-        created_at: '2024-01-20T14:30:00Z'
-      }
-    ];
+    const { data, error } = await supabase
+      .from('feedback')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching feedback:', error);
+      return [];
+    }
+
+    return data || [];
   },
 
   async create(feedback: Omit<Feedback, 'id' | 'created_at'>): Promise<Feedback | null> {
-    // For now, just return the feedback with generated ID
-    return {
-      ...feedback,
-      id: `feedback-${Date.now()}`,
-      created_at: new Date().toISOString()
-    };
+    const { data, error } = await supabase
+      .from('feedback')
+      .insert([feedback])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating feedback:', error);
+      return null;
+    }
+
+    return data;
   }
 };

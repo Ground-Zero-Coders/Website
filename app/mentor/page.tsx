@@ -854,21 +854,47 @@ function FeedbackContent({ mentor }: { mentor: Mentor }) {
     nextWeekPlans: '',
     additionalNotes: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle feedback submission
-    console.log('Feedback submitted by', mentor.name, ':', feedback);
-    alert('Weekly feedback submitted successfully!');
-    // Reset form
-    setFeedback({
-      weekOf: '',
-      teamProgress: '',
-      challenges: '',
-      achievements: '',
-      nextWeekPlans: '',
-      additionalNotes: ''
-    });
+    setIsSubmitting(true);
+    
+    try {
+      const feedbackData = {
+        mentor_id: mentor.id,
+        mentor_name: mentor.name,
+        week_of: feedback.weekOf,
+        team_progress: feedback.teamProgress,
+        challenges: feedback.challenges,
+        achievements: feedback.achievements,
+        next_week_plans: feedback.nextWeekPlans,
+        additional_notes: feedback.additionalNotes
+      };
+
+      const { feedbackService } = await import('@/lib/supabase');
+      const result = await feedbackService.create(feedbackData);
+      
+      if (result) {
+        alert('Weekly feedback submitted successfully!');
+        // Reset form
+        setFeedback({
+          weekOf: '',
+          teamProgress: '',
+          challenges: '',
+          achievements: '',
+          nextWeekPlans: '',
+          additionalNotes: ''
+        });
+      } else {
+        alert('Failed to submit feedback. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      alert('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -962,9 +988,10 @@ function FeedbackContent({ mentor }: { mentor: Mentor }) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-[#00bcd4] dark:bg-[#14b8a6] text-white py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            disabled={isSubmitting}
+            className="w-full bg-[#00bcd4] dark:bg-[#14b8a6] text-white py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
           >
-            Submit Weekly Feedback
+            {isSubmitting ? 'Submitting...' : 'Submit Weekly Feedback'}
           </motion.button>
         </form>
       </div>

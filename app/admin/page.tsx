@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { Shield, User, Lock, Eye, EyeOff, Plus, MessageSquare, FolderPlus, Users, Calendar, Settings, LogOut, Menu, X } from 'lucide-react';
 import { feedbackService, projectService, mentorService, menteeService, type Feedback, type Project, type Mentor, type Mentee } from '@/lib/supabase';
 import { adminService, type Admin } from '@/lib/supabase';
-import { feedbackData, ExtendedFeedback } from '@/data/feedback';
 
 
 
@@ -22,6 +21,20 @@ export default function AdminDashboardPage() {
   const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Check for existing login on component mount
+  useEffect(() => {
+    const savedAdmin = localStorage.getItem('adminSession');
+    if (savedAdmin) {
+      try {
+        const adminData = JSON.parse(savedAdmin);
+        setCurrentAdmin(adminData);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error parsing saved admin session:', error);
+        localStorage.removeItem('adminSession');
+      }
+    }
+  }, []);
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
@@ -33,6 +46,8 @@ export default function AdminDashboardPage() {
       if (admin) {
         setCurrentAdmin(admin);
         setIsLoggedIn(true);
+        // Save admin session to localStorage
+        localStorage.setItem('adminSession', JSON.stringify(admin));
       } else {
         setLoginError('Invalid Admin ID or Password');
       }
@@ -48,6 +63,8 @@ export default function AdminDashboardPage() {
     setIsLoggedIn(false);
     setCurrentAdmin(null);
     setLoginData({ adminId: '', password: '' });
+    // Remove admin session from localStorage
+    localStorage.removeItem('adminSession');
   };
 
   if (!isLoggedIn) {
@@ -362,12 +379,27 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
 
 // Feedback Panel Content
 function FeedbackPanelContent() {
-const [feedback, setFeedback] = useState<ExtendedFeedback[]>(feedbackData);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => setLoading(false), 500);
+    const fetchFeedback = async () => {
+      try {
+        const data = await feedbackService.getAll();
+        setFeedback(data);
+      } catch (error) {
+        console.error('Error fetching feedback:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeedback();
+
+    // Set up real-time polling every 5 seconds
+    const interval = setInterval(fetchFeedback, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
@@ -412,20 +444,26 @@ const [feedback, setFeedback] = useState<ExtendedFeedback[]>(feedbackData);
               </div>
               <div className="space-y-3 text-gray-400 text-sm">
                 <div>
-                  <span className="font-semibold text-white">Progress:</span> {item.teamProgress}
+                  <span className="font-semibold text-white">Progress:</span> {item.team_progress}
                 </div>
-                <div>
-                  <span className="font-semibold text-white">Challenges:</span> {item.challenges}
-                </div>
-                <div>
-                  <span className="font-semibold text-white">Achievements:</span> {item.achievements}
-                </div>
-                <div>
-                  <span className="font-semibold text-white">Next Week:</span> {item.nextWeekPlans}
-                </div>
-                {item.additionalNotes && (
+                {item.challenges && (
                   <div>
-                    <span className="font-semibold text-white">Notes:</span> {item.additionalNotes}
+                    <span className="font-semibold text-white">Challenges:</span> {item.challenges}
+                  </div>
+                )}
+                {item.achievements && (
+                  <div>
+                    <span className="font-semibold text-white">Achievements:</span> {item.achievements}
+                  </div>
+                )}
+                {item.next_week_plans && (
+                  <div>
+                    <span className="font-semibold text-white">Next Week:</span> {item.next_week_plans}
+                  </div>
+                )}
+                {item.additional_notes && (
+                  <div>
+                    <span className="font-semibold text-white">Notes:</span> {item.additional_notes}
                   </div>
                 )}
               </div>
