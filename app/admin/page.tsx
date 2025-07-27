@@ -156,7 +156,7 @@ export default function AdminDashboardPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
-                Demo credentials: admin-001 / ******
+                
               </p>
             </div>
           </div>

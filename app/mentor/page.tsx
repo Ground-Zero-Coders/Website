@@ -153,7 +153,7 @@ export default function AdminPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500">
-                Demo credentials: mentor-001 / sarah2024
+                
               </p>
             </div>
           </div>
