@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Shield, User, Lock, Eye, EyeOff, ExternalLink } from 'lucide-react';
-import { mentorService, type Mentor } from '@/lib/supabase';
+import { mentorService, projectService, menteeService, type Mentor, type Project, type Mentee } from '@/lib/supabase';
 import { mentorResources, type Resource } from '@/data/resources';
 import Navbar from '@/components/navbar'; 
 export default function AdminPage() {
@@ -176,8 +176,9 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
         <nav className="p-4 space-y-2 flex-1">
           {[
             { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-            { id: 'teams', label: 'Teams', icon: '👥' },
+            { id: 'teams', label: 'My Mentees', icon: '👥' },
             { id: 'projects', label: 'Projects', icon: '🚀' },
+            { id: 'add-project', label: 'Add Project', icon: '➕' },
             { id: 'updates', label: 'Updates', icon: '📅' },
             { id: 'resources', label: 'Resources', icon: '📚' },
             { id: 'feedback', label: 'Feedback', icon: '💬' },
@@ -222,8 +223,9 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
           </div>
           <h2 className="font-space-grotesk text-2xl font-bold text-black dark:text-white">
             {activeTab === 'dashboard' && 'Dashboard'}
-            {activeTab === 'teams' && 'My Teams'}
+            {activeTab === 'teams' && 'My Mentees'}
             {activeTab === 'projects' && 'My Projects'}
+            {activeTab === 'add-project' && 'Add New Project'}
             {activeTab === 'updates' && 'Updates & Meetings'}
             {activeTab === 'resources' && 'Resources'}
             {activeTab === 'feedback' && 'Weekly Feedback'}
@@ -235,6 +237,7 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
           {activeTab === 'dashboard' && <DashboardContent mentor={mentor} />}
           {activeTab === 'teams' && <TeamsContent mentor={mentor} />}
           {activeTab === 'projects' && <ProjectsContent mentor={mentor} />}
+          {activeTab === 'add-project' && <AddProjectContent mentor={mentor} />}
           {activeTab === 'updates' && <UpdatesContent />}
           {activeTab === 'resources' && <ResourcesContent />}
           {activeTab === 'feedback' && <FeedbackContent mentor={mentor} />}
@@ -282,12 +285,81 @@ function DashboardContent({ mentor }: { mentor: Mentor }) {
 
 // Teams Content
 function TeamsContent({ mentor }: { mentor: Mentor }) {
-  // For now, show a placeholder since we don't have teams table yet
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMentees = async () => {
+      try {
+        const data = await menteeService.getByMentorId(mentor.id);
+        setMentees(data);
+      } catch (error) {
+        console.error('Error fetching mentees:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentees();
+  }, [mentor.id]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-600 dark:text-gray-400">Loading mentees...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="text-center py-12">
-      <p className="text-gray-600 dark:text-gray-400 mb-4">Teams management coming soon!</p>
-      <p className="text-sm text-gray-500">This feature will be available once the teams table is implemented.</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-space-grotesk text-xl font-semibold text-black dark:text-white">
+          My Mentees ({mentees.length})
+        </h3>
+      </div>
+
+      {mentees.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600 dark:text-gray-400">No mentees assigned yet.</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {mentees.map((mentee) => (
+            <div key={mentee.id} className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="w-12 h-12 bg-[#00bcd4]/10 dark:bg-[#14b8a6]/10 rounded-full flex items-center justify-center">
+                  <span className="text-[#00bcd4] dark:text-[#14b8a6] font-semibold text-lg">
+                    {mentee.name.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-space-grotesk font-semibold text-black dark:text-white">
+                    {mentee.name}
+                  </h4>
+                  <p className="text-sm text-gray-500">{mentee.domain}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-2 text-sm">
+                <p><strong>Email:</strong> {mentee.email}</p>
+                <p><strong>Group:</strong> {mentee.group_name || 'Not assigned'}</p>
+                <p><strong>GitHub:</strong> {mentee.github_id || 'Not provided'}</p>
+                <p><strong>Join Date:</strong> {new Date(mentee.join_date).toLocaleDateString()}</p>
+                <p><strong>Status:</strong> 
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                    mentee.status === 'active' ? 'bg-green-100 text-green-800' :
+                    mentee.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {mentee.status}
+                  </span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -358,6 +430,236 @@ function ProjectsContent({ mentor }: { mentor: Mentor }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// Add Project Content
+function AddProjectContent({ mentor }: { mentor: Mentor }) {
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    github: '',
+    mentee: '',
+    mentor: mentor.name,
+    mentor_id: mentor.id,
+    date: '',
+    group: '',
+    description: '',
+    image: '',
+    occasion: '',
+    status: 'completed'
+  });
+
+  useEffect(() => {
+    const fetchMentees = async () => {
+      try {
+        const data = await menteeService.getByMentorId(mentor.id);
+        setMentees(data);
+      } catch (error) {
+        console.error('Error fetching mentees:', error);
+      }
+    };
+
+    fetchMentees();
+  }, [mentor.id]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const newProject = await projectService.create(formData);
+      if (newProject) {
+        alert('Project created successfully!');
+        setFormData({
+          name: '',
+          github: '',
+          mentee: '',
+          mentor: mentor.name,
+          mentor_id: mentor.id,
+          date: '',
+          group: '',
+          description: '',
+          image: '',
+          occasion: '',
+          status: 'completed'
+        });
+      } else {
+        alert('Failed to create project. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating project:', error);
+      alert('Failed to create project. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <h3 className="font-space-grotesk text-xl font-semibold text-black dark:text-white mb-6">
+          Add New Project
+        </h3>
+        
+        <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Project Name *
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              GitHub Repository
+            </label>
+            <input
+              type="url"
+              value={formData.github}
+              onChange={(e) => setFormData({ ...formData, github: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              placeholder="https://github.com/..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Mentee(s) *
+            </label>
+            <select
+              value={formData.mentee}
+              onChange={(e) => setFormData({ ...formData, mentee: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              required
+            >
+              <option value="">Select mentee(s)</option>
+              {mentees.map((mentee) => (
+                <option key={mentee.id} value={mentee.name}>
+                  {mentee.name} ({mentee.domain})
+                </option>
+              ))}
+              <option value="custom">Enter custom names</option>
+            </select>
+            {formData.mentee === 'custom' && (
+              <input
+                type="text"
+                placeholder="Enter mentee names (comma separated)"
+                onChange={(e) => setFormData({ ...formData, mentee: e.target.value })}
+                className="w-full mt-2 px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Project Date *
+            </label>
+            <input
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Category *
+            </label>
+            <select
+              value={formData.group}
+              onChange={(e) => setFormData({ ...formData, group: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              required
+            >
+              <option value="">Select category</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Mobile Development">Mobile Development</option>
+              <option value="Artificial Intelligence">Artificial Intelligence</option>
+              <option value="Data Science">Data Science</option>
+              <option value="Blockchain">Blockchain</option>
+              <option value="IoT">IoT</option>
+              <option value="Data Visualization">Data Visualization</option>
+              <option value="AR/VR">AR/VR</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Status *
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              required
+            >
+              <option value="completed">Completed</option>
+              <option value="in-progress">In Progress</option>
+              <option value="planned">Planned</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors resize-none text-black dark:text-white"
+              placeholder="Brief description of the project..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Image URL
+            </label>
+            <input
+              type="url"
+              value={formData.image}
+              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              placeholder="https://images.pexels.com/..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-black dark:text-white mb-2">
+              Occasion
+            </label>
+            <input
+              type="text"
+              value={formData.occasion}
+              onChange={(e) => setFormData({ ...formData, occasion: e.target.value })}
+              className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-[#00bcd4] dark:focus:border-[#14b8a6] transition-colors text-black dark:text-white"
+              placeholder="Hackathon 2024, Workshop, etc."
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#00bcd4] dark:bg-[#14b8a6] text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+            >
+              {loading ? 'Creating Project...' : 'Create Project'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

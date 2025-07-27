@@ -1,7 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hceehmxkiwheaaceouvd.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjZWVobXhraXdoZWFhY2VvdXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc4MjU2NzQsImV4cCI6MjA1MzQwMTY3NH0.qJGvJhkJGJGJGJGJGJGJGJGJGJGJGJGJGJGJGJGJGJG';
+
+if (!supabaseUrl) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+}
+
+if (!supabaseAnonKey) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -46,6 +54,20 @@ export interface Project {
   description?: string;
   image?: string;
   occasion?: string;
+  status: string;
+  created_at: string;
+}
+
+export interface Mentee {
+  id: string;
+  name: string;
+  email: string;
+  group_name?: string;
+  mentor_id?: string;
+  mentor_name?: string;
+  domain?: string;
+  github_id?: string;
+  join_date: string;
   status: string;
   created_at: string;
 }
@@ -169,6 +191,82 @@ export const projectService = {
     }
 
     return data || [];
+  }
+};
+
+export const menteeService = {
+  async getAll(): Promise<Mentee[]> {
+    const { data, error } = await supabase
+      .from('mentees')
+      .select('*')
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching mentees:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async getByMentorId(mentorId: string): Promise<Mentee[]> {
+    const { data, error } = await supabase
+      .from('mentees')
+      .select('*')
+      .eq('mentor_id', mentorId)
+      .order('name');
+
+    if (error) {
+      console.error('Error fetching mentees by mentor:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async create(mentee: Omit<Mentee, 'id' | 'created_at'>): Promise<Mentee | null> {
+    const { data, error } = await supabase
+      .from('mentees')
+      .insert([mentee])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating mentee:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async update(id: string, updates: Partial<Mentee>): Promise<Mentee | null> {
+    const { data, error } = await supabase
+      .from('mentees')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating mentee:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('mentees')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting mentee:', error);
+      return false;
+    }
+
+    return true;
   }
 };
 

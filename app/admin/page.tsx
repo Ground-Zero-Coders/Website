@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, User, Lock, Eye, EyeOff, Plus, MessageSquare, FolderPlus, Users, Calendar, Settings, LogOut } from 'lucide-react';
-import { feedbackService, projectService, mentorService, type Feedback, type Project, type Mentor } from '@/lib/supabase';
+import { feedbackService, projectService, mentorService, menteeService, type Feedback, type Project, type Mentor, type Mentee } from '@/lib/supabase';
 import { authenticateAdmin, type AdminCredentials } from '@/data/adminAuth';
 import { feedbackData, ExtendedFeedback } from '@/data/feedback';
 
@@ -179,7 +179,7 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
             { id: 'dashboard', label: 'Dashboard', icon: '📊' },
             { id: 'feedback', label: 'Feedback Panel', icon: '💬' },
             { id: 'projects', label: 'Project Manager', icon: '🚀' },
-            { id: 'teams', label: 'Team Manager', icon: '👥', disabled: true },
+            { id: 'mentees', label: 'Mentee Manager', icon: '👥' },
             { id: 'meetings', label: 'Meeting Scheduler', icon: '📅', disabled: true },
             { id: 'mentors', label: 'Mentor Assignment', icon: '🎓', disabled: true },
             { id: 'settings', label: 'Settings', icon: '⚙️', disabled: true },
@@ -231,7 +231,7 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
             {activeTab === 'dashboard' && 'Admin Dashboard'}
             {activeTab === 'feedback' && 'Feedback Panel'}
             {activeTab === 'projects' && 'Project Manager'}
-            {activeTab === 'teams' && 'Team Manager'}
+            {activeTab === 'mentees' && 'Mentee Manager'}
             {activeTab === 'meetings' && 'Meeting Scheduler'}
             {activeTab === 'mentors' && 'Mentor Assignment'}
             {activeTab === 'settings' && 'Settings'}
@@ -243,7 +243,7 @@ function AdminDashboard({ admin, onLogout }: { admin: AdminCredentials; onLogout
           {activeTab === 'dashboard' && <AdminDashboardContent admin={admin} />}
           {activeTab === 'feedback' && <FeedbackPanelContent />}
           {activeTab === 'projects' && <ProjectManagerContent />}
-          {activeTab === 'teams' && <ComingSoonContent feature="Team Manager" />}
+          {activeTab === 'mentees' && <MenteeManagerContent />}
           {activeTab === 'meetings' && <ComingSoonContent feature="Meeting Scheduler" />}
           {activeTab === 'mentors' && <ComingSoonContent feature="Mentor Assignment" />}
           {activeTab === 'settings' && <ComingSoonContent feature="Settings" />}
@@ -258,6 +258,7 @@ function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalMentors: 0,
+    totalMentees: 0,
     totalFeedback: 0,
     activeProjects: 0
   });
@@ -265,15 +266,17 @@ function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [projects, mentors, feedback] = await Promise.all([
+        const [projects, mentors, mentees, feedback] = await Promise.all([
           projectService.getAll(),
           mentorService.getAll(),
+          menteeService.getAll(),
           feedbackService.getAll()
         ]);
 
         setStats({
           totalProjects: projects.length,
           totalMentors: mentors.length,
+          totalMentees: mentees.length,
           totalFeedback: feedback.length,
           activeProjects: projects.filter(p => p.status === 'in-progress').length
         });
@@ -301,8 +304,12 @@ function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
           <p className="text-3xl font-bold text-blue-500">{stats.totalMentors}</p>
         </div>
         <div className="glass-card p-6 rounded-xl">
+          <h3 className="font-semibold text-white mb-2">Total Mentees</h3>
+          <p className="text-3xl font-bold text-purple-500">{stats.totalMentees}</p>
+        </div>
+        <div className="glass-card p-6 rounded-xl">
           <h3 className="font-semibold text-white mb-2">Feedback Messages</h3>
-          <p className="text-3xl font-bold text-purple-500">{stats.totalFeedback}</p>
+          <p className="text-3xl font-bold text-orange-500">{stats.totalFeedback}</p>
         </div>
       </div>
 
@@ -319,12 +326,12 @@ function AdminDashboardContent({ admin }: { admin: AdminCredentials }) {
             <ul className="space-y-1 text-gray-400">
               <li>• Feedback Panel - View mentor feedback</li>
               <li>• Project Manager - Add new projects</li>
+              <li>• Mentee Manager - Manage mentees and assignments</li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold text-white mb-2">Coming Soon:</h4>
             <ul className="space-y-1 text-gray-400">
-              <li>• Team Manager</li>
               <li>• Meeting Scheduler</li>
               <li>• Mentor Assignment</li>
               <li>• Advanced Settings</li>
@@ -700,6 +707,315 @@ function ProjectManagerContent() {
               }`}>
                 {project.status}
               </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Mentee Manager Content
+function MenteeManagerContent() {
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editingMentee, setEditingMentee] = useState<Mentee | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    group_name: '',
+    mentor_id: '',
+    mentor_name: '',
+    domain: '',
+    github_id: '',
+    status: 'active'
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [menteesData, mentorsData] = await Promise.all([
+          menteeService.getAll(),
+          mentorService.getAll()
+        ]);
+        setMentees(menteesData);
+        setMentors(mentorsData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingMentee) {
+        const updatedMentee = await menteeService.update(editingMentee.id, formData);
+        if (updatedMentee) {
+          setMentees(mentees.map(m => m.id === editingMentee.id ? updatedMentee : m));
+          alert('Mentee updated successfully!');
+        }
+      } else {
+        const newMentee = await menteeService.create(formData);
+        if (newMentee) {
+          setMentees([newMentee, ...mentees]);
+          alert('Mentee created successfully!');
+        }
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error saving mentee:', error);
+      alert('Failed to save mentee. Please try again.');
+    }
+  };
+
+  const handleEdit = (mentee: Mentee) => {
+    setEditingMentee(mentee);
+    setFormData({
+      name: mentee.name,
+      email: mentee.email,
+      group_name: mentee.group_name || '',
+      mentor_id: mentee.mentor_id || '',
+      mentor_name: mentee.mentor_name || '',
+      domain: mentee.domain || '',
+      github_id: mentee.github_id || '',
+      status: mentee.status
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (mentee: Mentee) => {
+    if (confirm(`Are you sure you want to delete ${mentee.name}?`)) {
+      const success = await menteeService.delete(mentee.id);
+      if (success) {
+        setMentees(mentees.filter(m => m.id !== mentee.id));
+        alert('Mentee deleted successfully!');
+      } else {
+        alert('Failed to delete mentee.');
+      }
+    }
+  };
+
+  const handleMentorChange = (mentorId: string) => {
+    const selectedMentor = mentors.find(m => m.id === mentorId);
+    setFormData({
+      ...formData,
+      mentor_id: mentorId,
+      mentor_name: selectedMentor ? selectedMentor.name : ''
+    });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      group_name: '',
+      mentor_id: '',
+      mentor_name: '',
+      domain: '',
+      github_id: '',
+      status: 'active'
+    });
+    setEditingMentee(null);
+    setShowForm(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-400">Loading mentees...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-space-grotesk text-xl font-semibold text-white">
+          Mentee Management
+        </h3>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform duration-300 flex items-center space-x-2"
+        >
+          <Plus className="h-4 w-4" />
+          <span>Add New Mentee</span>
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="glass-card p-6 rounded-xl">
+          <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
+            {editingMentee ? 'Edit Mentee' : 'Add New Mentee'}
+          </h4>
+          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Group/Team Name
+              </label>
+              <input
+                type="text"
+                value={formData.group_name}
+                onChange={(e) => setFormData({ ...formData, group_name: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+                placeholder="Web Warriors, AI Pioneers, etc."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Assign Mentor
+              </label>
+              <select
+                value={formData.mentor_id}
+                onChange={(e) => handleMentorChange(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+              >
+                <option value="">Select a mentor</option>
+                {mentors.map((mentor) => (
+                  <option key={mentor.id} value={mentor.id}>
+                    {mentor.name} ({mentor.department})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Domain/Specialization
+              </label>
+              <input
+                type="text"
+                value={formData.domain}
+                onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+                placeholder="Frontend Development, AI/ML, etc."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                GitHub Username
+              </label>
+              <input
+                type="text"
+                value={formData.github_id}
+                onChange={(e) => setFormData({ ...formData, github_id: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+                placeholder="github-username"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Status
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="graduated">Graduated</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 flex space-x-4">
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
+              >
+                {editingMentee ? 'Update Mentee' : 'Create Mentee'}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="glass-card p-6 rounded-xl">
+        <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
+          All Mentees ({mentees.length})
+        </h4>
+        <div className="space-y-4 max-h-96 overflow-y-auto">
+          {mentees.map((mentee) => (
+            <div key={mentee.id} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-cyan-400 font-semibold">
+                    {mentee.name.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <h5 className="font-semibold text-white">{mentee.name}</h5>
+                  <p className="text-sm text-gray-400">
+                    {mentee.domain} • {mentee.mentor_name || 'No mentor assigned'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {mentee.group_name} • {new Date(mentee.join_date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  mentee.status === 'active' ? 'bg-green-100 text-green-800' :
+                  mentee.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                  'bg-blue-100 text-blue-800'
+                }`}>
+                  {mentee.status}
+                </span>
+                <button
+                  onClick={() => handleEdit(mentee)}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(mentee)}
+                  className="text-red-400 hover:text-red-300 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>
