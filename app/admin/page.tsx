@@ -762,17 +762,16 @@ const [formData, setFormData] = useState({
         if (updatedMentee) {
           setMentees(mentees.map(m => m.id === editingMentee.id ? updatedMentee : m));
           alert('Mentee updated successfully!');
+          resetForm();
         }
       } else {
-        formData.join_date = new Date().toISOString().split("T")[0]; // adds today in 'YYYY-MM-DD' format
-
         const newMentee = await menteeService.create(formData);
         if (newMentee) {
           setMentees([newMentee, ...mentees]);
           alert('Mentee created successfully!');
+          resetForm();
         }
       }
-      resetForm();
     } catch (error) {
       console.error('Error saving mentee:', error);
       alert('Failed to save mentee. Please try again.');
@@ -790,7 +789,7 @@ const handleEdit = (mentee: Mentee) => {
     domain: mentee.domain || '',
     github_id: mentee.github_id || '',
     status: mentee.status,
-    join_date: mentee.join_date || new Date().toISOString().split("T")[0] // 👈 Important
+    join_date: mentee.join_date || new Date().toISOString().split("T")[0]
   });
   setShowForm(true);
 };
@@ -813,7 +812,7 @@ const handleEdit = (mentee: Mentee) => {
     setFormData({
       ...formData,
       mentor_id: mentorId,
-      mentor_name: selectedMentor ? selectedMentor.name : ''
+      mentor_name: selectedMentor?.name || ''
     });
   };
 
@@ -827,7 +826,7 @@ const resetForm = () => {
     domain: '',
     github_id: '',
     status: 'active',
-    join_date: new Date().toISOString().split("T")[0]  // 👈 today's date as default
+    join_date: new Date().toISOString().split("T")[0]
   });
   setEditingMentee(null);
   setShowForm(false);
@@ -996,10 +995,10 @@ const resetForm = () => {
                 <div>
                   <h5 className="font-semibold text-white">{mentee.name}</h5>
                   <p className="text-sm text-gray-400">
-                    {mentee.domain} • {mentee.mentor_name || 'No mentor assigned'}
+                    {mentee.domain || 'No domain'} • {mentee.mentor_name || 'No mentor assigned'}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {mentee.group_name} • {new Date(mentee.join_date).toLocaleDateString()}
+                    {mentee.group_name || 'No group'} • {new Date(mentee.join_date).toLocaleDateString()}
                   </p>
                 </div>
               </div>

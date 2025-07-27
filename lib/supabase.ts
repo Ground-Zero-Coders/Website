@@ -198,7 +198,10 @@ export const menteeService = {
   async getAll(): Promise<Mentee[]> {
     const { data, error } = await supabase
       .from('mentees')
-      .select('*')
+      .select(`
+        *,
+        mentor:mentors(name)
+      `)
       .order('name');
 
     if (error) {
@@ -206,13 +209,20 @@ export const menteeService = {
       return [];
     }
 
-    return data || [];
+    // Transform the data to include mentor_name
+    return (data || []).map(mentee => ({
+      ...mentee,
+      mentor_name: mentee.mentor?.name || null
+    }));
   },
 
   async getByMentorId(mentorId: string): Promise<Mentee[]> {
     const { data, error } = await supabase
       .from('mentees')
-      .select('*')
+      .select(`
+        *,
+        mentor:mentors(name)
+      `)
       .eq('mentor_id', mentorId)
       .order('name');
 
@@ -221,14 +231,24 @@ export const menteeService = {
       return [];
     }
 
-    return data || [];
+    // Transform the data to include mentor_name
+    return (data || []).map(mentee => ({
+      ...mentee,
+      mentor_name: mentee.mentor?.name || null
+    }));
   },
 
   async create(mentee: Omit<Mentee, 'id' | 'created_at'>): Promise<Mentee | null> {
+    // Remove mentor_name from the data being inserted since it's not a real column
+    const { mentor_name, ...menteeData } = mentee as any;
+    
     const { data, error } = await supabase
       .from('mentees')
-      .insert([mentee])
-      .select()
+      .insert([menteeData])
+      .select(`
+        *,
+        mentor:mentors(name)
+      `)
       .single();
 
     if (error) {
@@ -236,15 +256,25 @@ export const menteeService = {
       return null;
     }
 
-    return data;
+    // Transform the data to include mentor_name
+    return {
+      ...data,
+      mentor_name: data.mentor?.name || null
+    };
   },
 
   async update(id: string, updates: Partial<Mentee>): Promise<Mentee | null> {
+    // Remove mentor_name from the updates since it's not a real column
+    const { mentor_name, ...updateData } = updates as any;
+    
     const { data, error } = await supabase
       .from('mentees')
-      .update(updates)
+      .update(updateData)
       .eq('id', id)
-      .select()
+      .select(`
+        *,
+        mentor:mentors(name)
+      `)
       .single();
 
     if (error) {
@@ -252,7 +282,11 @@ export const menteeService = {
       return null;
     }
 
-    return data;
+    // Transform the data to include mentor_name
+    return {
+      ...data,
+      mentor_name: data.mentor?.name || null
+    };
   },
 
   async delete(id: string): Promise<boolean> {
