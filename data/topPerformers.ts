@@ -5,7 +5,7 @@ export interface TopPerformer {
   domain: string;
   image: string;
   achievement: string;
-  githubId: string;
+
 }
 
 export const topPerformers: TopPerformer[] = [
