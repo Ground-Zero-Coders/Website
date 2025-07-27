@@ -17,14 +17,14 @@ const upcomingEvents = [
     date: 'Coming Soon',
     location: 'Online',
     participants: 'Internal',
-    link: 'https://forms.gle/xyz456IDEA'
+    link: '#'
   },
   {
     title: 'Quiz Challenge',
     date: 'Coming Soon',
     location: 'Online',
     participants: 'Internal',
-    link: 'https://forms.gle/qwe789QUIZ'
+    link: '#'
   }
 ];
 
