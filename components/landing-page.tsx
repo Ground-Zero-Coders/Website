@@ -108,24 +108,25 @@ export default function LandingPage() {
                   designers, and tech enthusiasts building the future of technology.
                 </motion.p>
 
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.9 }}
-                  className="space-y-4"
-                >
-                  {[
-                    "Premier tech organization since June 2025",
-                    "500+ active developers and designers",
-                    "25+ innovative projects completed",
-                    "5+ successful hackathons organized",
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center space-x-3 text-gray-300">
-                      <ChevronRight className="h-5 w-5 text-cyan-400" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </motion.div>
+<motion.div
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, delay: 0.9 }}
+  className="space-y-4"
+>
+  {[
+    "Premier tech organization since June 2025",
+    "500+ active developers and designers",
+    `${projectCount} + innovative projects completed`,
+    "5+ successful hackathons organized",
+  ].map((item, i) => (
+    <div key={i} className="flex items-center space-x-3 text-gray-300">
+      <ChevronRight className="h-5 w-5 text-primarine" />
+      <span>{item}</span>
+    </div>
+  ))}
+</motion.div>
+
               </div>
 
               <motion.div
