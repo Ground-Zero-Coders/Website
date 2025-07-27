@@ -36,7 +36,7 @@ export const coreTeam: CoreTeamMember[] = [
     id: 'ct-005',
     name: 'Shreya Gupta',
     position: 'Management Head',
-    image: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
+    image: '/shreya.jpg',
    },
    {
     id: 'ct-006',
