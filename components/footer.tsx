@@ -99,7 +99,9 @@ export default function Footer() {
       <p className="text-gray-500 text-sm">
         © 2025 Ground Zero Coders. All rights reserved.
       </p>
+      <div className="flex space-x-6 mt-4 md:mt-0">
 
+      </div>
     </div>
   </div>
 </footer>
