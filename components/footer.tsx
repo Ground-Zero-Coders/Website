@@ -97,7 +97,7 @@ export default function Footer() {
     {/* Bottom */}
     <div className="mt-16 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
       <p className="text-gray-500 text-sm">
-        © 2025 Ground Zero Coders. All rights reserved.
+        © 2025 Ground Zero Coders.
       </p>
       <div className="flex space-x-6 mt-4 md:mt-0">
 
