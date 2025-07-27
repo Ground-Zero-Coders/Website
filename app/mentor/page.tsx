@@ -278,21 +278,68 @@ function MentorDashboard({ mentor, onLogout }: { mentor: Mentor; onLogout: () =>
   );
 }
 
+
+
 function DashboardContent({ mentor }: { mentor: Mentor }) {
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingMentees, setLoadingMentees] = useState(true);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+
+  // Fetch mentees
+  useEffect(() => {
+    const fetchMentees = async () => {
+      try {
+        const data = await menteeService.getByMentorId(mentor.id);
+        setMentees(data);
+      } catch (error) {
+        console.error('Failed to fetch mentees:', error);
+      } finally {
+        setLoadingMentees(false);
+      }
+    };
+
+    fetchMentees();
+  }, [mentor.id]);
+
+  // Fetch projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await projectService.getByMentorId(mentor.id);
+        setProjects(data);
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+
+    fetchProjects();
+  }, [mentor.id]);
+
+  const activeProjects = projects.filter(p => p.status === 'in-progress');
+
   return (
     <div className="space-y-6">
       <div className="grid md:grid-cols-3 gap-6">
         {[
-          { title: 'Total Teams', count: 4 },
-          { title: 'Active Projects', count: 6 },
-          { title: 'Mentees', count: 16 }
+          { title: 'Total Teams', count: Math.ceil(mentees.length / 4) },
+
+          { title: 'Active Projects', count: activeProjects.length },
+          { title: 'Mentees', count: mentees.length }
         ].map((item, i) => (
           <div
             key={i}
             className="bg-gray-900 p-6 rounded-xl border border-gray-700"
           >
             <h3 className="font-semibold text-white mb-2">{item.title}</h3>
-            <p className="text-3xl font-bold text-[#14b8a6]">{item.count}</p>
+            <p className="text-3xl font-bold text-[#14b8a6]">
+              {(item.title === 'Active Projects' && loadingProjects) ||
+              (item.title === 'Mentees' && loadingMentees)
+                ? '...'
+                : item.count}
+            </p>
           </div>
         ))}
       </div>
@@ -313,7 +360,6 @@ function DashboardContent({ mentor }: { mentor: Mentor }) {
     </div>
   );
 }
-
 
 // Teams Content
 function TeamsContent({ mentor }: { mentor: Mentor }) {
