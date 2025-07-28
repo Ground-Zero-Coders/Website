@@ -7,7 +7,7 @@ import CoreTeamSection from '@/components/core-team-section';
 import TopPerformersSection from '@/components/top-performers-section';
 import ProjectsPreview from '@/components/projects-preview';
 import Footer from '@/components/footer';
-
+import { Analytics } from "@vercel/analytics/next"
 
 
 
@@ -16,6 +16,7 @@ import Footer from '@/components/footer';
 export default function Home() {
   return (
     <main className="bg-black">
+      <Analytics />
       <Navbar />
       <LandingPage />
       <HeroSection />
