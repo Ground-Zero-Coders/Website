@@ -41,6 +41,21 @@ export default function AdminDashboardPage() {
     setIsLoading(true);
 
     try {
+      // Check for hardcoded test admin first
+      if (loginData.adminId === 'Harsimran7765' && loginData.password === 'Hr626264') {
+        const testAdmin = {
+          id: 'Harsimran7765',
+          name: 'Harsimran Singh',
+          email: 'HarsimranSingh7765@gmail.com',
+          role: 'admin',
+          created_at: new Date().toISOString()
+        };
+        setCurrentAdmin(testAdmin);
+        setIsLoggedIn(true);
+        localStorage.setItem('adminSession', JSON.stringify(testAdmin));
+        return;
+      }
+
       const admin = await adminService.authenticate(loginData.adminId, loginData.password);
 
       if (admin) {
