@@ -48,7 +48,8 @@ export default function AdminDashboardPage() {
           name: 'Harsimran Singh',
           email: 'HarsimranSingh7765@gmail.com',
           role: 'admin',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          password: 'Hr626264'
         };
         setCurrentAdmin(testAdmin);
         setIsLoggedIn(true);
