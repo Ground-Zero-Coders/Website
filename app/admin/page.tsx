@@ -224,8 +224,6 @@ function AdminDashboard({ admin, onLogout }: { admin: Admin; onLogout: () => voi
             { id: 'feedback', label: 'Feedback Panel', icon: '' },
             { id: 'projects', label: 'Project Manager', icon: '' },
             { id: 'mentees', label: 'Mentee Manager', icon: '' },
-            { id: 'events', label: 'Event Manager', icon: '' },
-            { id: 'resources', label: 'Resource Manager', icon: '' },
             { id: 'meetings', label: 'Meeting Scheduler', icon: '', disabled: true },
             { id: 'mentors', label: 'Mentor Assignment', icon: '', disabled: true },
             { id: 'settings', label: 'Settings', icon: '', disabled: true },
@@ -284,8 +282,6 @@ function AdminDashboard({ admin, onLogout }: { admin: Admin; onLogout: () => voi
             {activeTab === 'feedback' && 'Feedback Panel'}
             {activeTab === 'projects' && 'Project Manager'}
             {activeTab === 'mentees' && 'Mentee Manager'}
-            {activeTab === 'events' && 'Event Manager'}
-            {activeTab === 'resources' && 'Resource Manager'}
             {activeTab === 'meetings' && 'Meeting Scheduler'}
             {activeTab === 'mentors' && 'Mentor Assignment'}
             {activeTab === 'settings' && 'Settings'}
@@ -298,8 +294,6 @@ function AdminDashboard({ admin, onLogout }: { admin: Admin; onLogout: () => voi
           {activeTab === 'feedback' && <FeedbackPanelContent />}
           {activeTab === 'projects' && <ProjectManagerContent />}
           {activeTab === 'mentees' && <MenteeManagerContent />}
-          {activeTab === 'events' && <EventManagerContent />}
-          {activeTab === 'resources' && <ResourceManagerContent />}
           {activeTab === 'meetings' && <ComingSoonContent feature="Meeting Scheduler" />}
           {activeTab === 'mentors' && <ComingSoonContent feature="Mentor Assignment" />}
           {activeTab === 'settings' && <ComingSoonContent feature="Settings" />}
@@ -316,21 +310,17 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
     totalMentors: 0,
     totalMentees: 0,
     totalFeedback: 0,
-    activeProjects: 0,
-    totalEvents: 0,
-    totalResources: 0
+    activeProjects: 0
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [projects, mentors, mentees, feedback, events, resources] = await Promise.all([
+        const [projects, mentors, mentees, feedback] = await Promise.all([
           projectService.getAll(),
           mentorService.getAll(),
           menteeService.getAll(),
-          feedbackService.getAll(),
-          eventService.getAll(),
-          resourceService.getAll()
+          feedbackService.getAll()
         ]);
 
         setStats({
@@ -338,9 +328,7 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
           totalMentors: mentors.length,
           totalMentees: mentees.length,
           totalFeedback: feedback.length,
-          activeProjects: projects.filter(p => p.status === 'in-progress').length,
-          totalEvents: events.length,
-          totalResources: resources.length
+          activeProjects: projects.filter(p => p.status === 'in-progress').length
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -352,7 +340,7 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-6">
+      <div className="grid md:grid-cols-4 gap-6">
         <div className="glass-card p-6 rounded-xl">
           <h3 className="font-semibold text-white mb-2">Total Projects</h3>
           <p className="text-3xl font-bold text-cyan-400">{stats.totalProjects}</p>
@@ -373,14 +361,6 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
           <h3 className="font-semibold text-white mb-2">Feedback Messages</h3>
           <p className="text-3xl font-bold text-orange-500">{stats.totalFeedback}</p>
         </div>
-        <div className="glass-card p-6 rounded-xl">
-          <h3 className="font-semibold text-white mb-2">Total Events</h3>
-          <p className="text-3xl font-bold text-pink-500">{stats.totalEvents}</p>
-        </div>
-        <div className="glass-card p-6 rounded-xl">
-          <h3 className="font-semibold text-white mb-2">Total Resources</h3>
-          <p className="text-3xl font-bold text-indigo-500">{stats.totalResources}</p>
-        </div>
       </div>
 
       <div className="glass-card p-6 rounded-xl">
@@ -397,8 +377,6 @@ function AdminDashboardContent({ admin }: { admin: Admin }) {
               <li>• Feedback Panel - View mentor feedback</li>
               <li>• Project Manager - Add new projects</li>
               <li>• Mentee Manager - Manage mentees and assignments</li>
-              <li>• Event Manager - Manage upcoming events</li>
-              <li>• Resource Manager - Manage mentor resources</li>
             </ul>
           </div>
           <div>
@@ -1111,555 +1089,6 @@ const resetForm = () => {
                 </button>
                 <button
                   onClick={() => handleDelete(mentee)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Event Manager Content
-function EventManagerContent() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    date: '',
-    location: '',
-    participants: 'Internal',
-    link: '',
-    status: 'upcoming'
-  });
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const data = await eventService.getAll();
-        setEvents(data);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingEvent) {
-        const updatedEvent = await eventService.update(editingEvent.id, formData);
-        if (updatedEvent) {
-          setEvents(events.map(e => e.id === editingEvent.id ? updatedEvent : e));
-          alert('Event updated successfully!');
-          resetForm();
-        }
-      } else {
-        const newEvent = await eventService.create(formData);
-        if (newEvent) {
-          setEvents([newEvent, ...events]);
-          alert('Event created successfully!');
-          resetForm();
-        }
-      }
-    } catch (error) {
-      console.error('Error saving event:', error);
-      alert('Failed to save event. Please try again.');
-    }
-  };
-
-  const handleEdit = (event: Event) => {
-    setEditingEvent(event);
-    setFormData({
-      title: event.title,
-      date: event.date,
-      location: event.location,
-      participants: event.participants,
-      link: event.link,
-      status: event.status
-    });
-    setShowForm(true);
-  };
-
-  const handleDelete = async (event: Event) => {
-    if (confirm(`Are you sure you want to delete "${event.title}"?`)) {
-      const success = await eventService.delete(event.id);
-      if (success) {
-        setEvents(events.filter(e => e.id !== event.id));
-        alert('Event deleted successfully!');
-      } else {
-        alert('Failed to delete event.');
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      date: '',
-      location: '',
-      participants: 'Internal',
-      link: '',
-      status: 'upcoming'
-    });
-    setEditingEvent(null);
-    setShowForm(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-400">Loading events...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-space-grotesk text-xl font-semibold text-white">
-          Event Management
-        </h3>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform duration-300 flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add New Event</span>
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="glass-card p-6 rounded-xl">
-          <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
-            {editingEvent ? 'Edit Event' : 'Add New Event'}
-          </h4>
-          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Event Title *
-              </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Date *
-              </label>
-              <input
-                type="text"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                placeholder="Coming Soon, Jan 15 2025, etc."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Location *
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                placeholder="Online, Offline, Hybrid"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Participants *
-              </label>
-              <select
-                value={formData.participants}
-                onChange={(e) => setFormData({ ...formData, participants: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              >
-                <option value="Internal">Internal</option>
-                <option value="External">External</option>
-                <option value="Mixed">Mixed</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Registration Link *
-              </label>
-              <input
-                type="url"
-                value={formData.link}
-                onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                placeholder="https://..."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Status *
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              >
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2 flex space-x-4">
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
-              >
-                {editingEvent ? 'Update Event' : 'Create Event'}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className="glass-card p-6 rounded-xl">
-        <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
-          All Events ({events.length})
-        </h4>
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {events.map((event) => (
-            <div key={event.id} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
-              <div className="flex-1">
-                <h5 className="font-semibold text-white">{event.title}</h5>
-                <p className="text-sm text-gray-400">
-                  {event.date} • {event.location} • {event.participants}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(event.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  event.status === 'upcoming' ? 'bg-blue-100 text-blue-800' :
-                  event.status === 'completed' ? 'bg-green-100 text-green-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {event.status}
-                </span>
-                <button
-                  onClick={() => handleEdit(event)}
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(event)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Resource Manager Content
-function ResourceManagerContent() {
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editingResource, setEditingResource] = useState<Resource | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    link: '',
-    type: 'Document',
-    category: 'guidelines',
-    is_external: true
-  });
-
-  useEffect(() => {
-    const fetchResources = async () => {
-      try {
-        const data = await resourceService.getAll();
-        setResources(data);
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResources();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      if (editingResource) {
-        const updatedResource = await resourceService.update(editingResource.id, formData);
-        if (updatedResource) {
-          setResources(resources.map(r => r.id === editingResource.id ? updatedResource : r));
-          alert('Resource updated successfully!');
-          resetForm();
-        }
-      } else {
-        const newResource = await resourceService.create(formData);
-        if (newResource) {
-          setResources([newResource, ...resources]);
-          alert('Resource created successfully!');
-          resetForm();
-        }
-      }
-    } catch (error) {
-      console.error('Error saving resource:', error);
-      alert('Failed to save resource. Please try again.');
-    }
-  };
-
-  const handleEdit = (resource: Resource) => {
-    setEditingResource(resource);
-    setFormData({
-      title: resource.title,
-      description: resource.description,
-      link: resource.link,
-      type: resource.type,
-      category: resource.category,
-      is_external: resource.is_external
-    });
-    setShowForm(true);
-  };
-
-  const handleDelete = async (resource: Resource) => {
-    if (confirm(`Are you sure you want to delete "${resource.title}"?`)) {
-      const success = await resourceService.delete(resource.id);
-      if (success) {
-        setResources(resources.filter(r => r.id !== resource.id));
-        alert('Resource deleted successfully!');
-      } else {
-        alert('Failed to delete resource.');
-      }
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      description: '',
-      link: '',
-      type: 'Document',
-      category: 'guidelines',
-      is_external: true
-    });
-    setEditingResource(null);
-    setShowForm(false);
-  };
-
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-400">Loading resources...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-space-grotesk text-xl font-semibold text-white">
-          Resource Management
-        </h3>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform duration-300 flex items-center space-x-2"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add New Resource</span>
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="glass-card p-6 rounded-xl">
-          <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
-            {editingResource ? 'Edit Resource' : 'Add New Resource'}
-          </h4>
-          <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Resource Title *
-              </label>
-              <input
-                type="text"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Resource Link *
-              </label>
-              <input
-                type="url"
-                value={formData.link}
-                onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                placeholder="https://..."
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Type *
-              </label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              >
-                <option value="PDF">PDF</option>
-                <option value="Folder">Folder</option>
-                <option value="Spreadsheet">Spreadsheet</option>
-                <option value="Document">Document</option>
-                <option value="Video">Video</option>
-                <option value="Link">Link</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Category *
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors text-white"
-                required
-              >
-                <option value="guidelines">Guidelines</option>
-                <option value="templates">Templates</option>
-                <option value="assessment">Assessment</option>
-                <option value="tech-stack">Tech Stack</option>
-                <option value="training">Training</option>
-                <option value="tools">Tools</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-white mb-2">
-                Description *
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="w-full px-4 py-3 bg-gray-800/50 backdrop-blur-sm border border-gray-600 rounded-lg focus:outline-none focus:border-cyan-400 transition-colors resize-none text-white"
-                placeholder="Brief description of the resource..."
-                required
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  checked={formData.is_external}
-                  onChange={(e) => setFormData({ ...formData, is_external: e.target.checked })}
-                  className="w-4 h-4 text-cyan-400 border-gray-600 rounded"
-                />
-                <span className="text-sm text-white">External Link (opens in new tab)</span>
-              </label>
-            </div>
-
-            <div className="md:col-span-2 flex space-x-4">
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
-              >
-                {editingResource ? 'Update Resource' : 'Create Resource'}
-              </button>
-              <button
-                type="button"
-                onClick={resetForm}
-                className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform duration-300 font-medium"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className="glass-card p-6 rounded-xl">
-        <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
-          All Resources ({resources.length})
-        </h4>
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {resources.map((resource) => (
-            <div key={resource.id} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
-              <div className="flex-1">
-                <h5 className="font-semibold text-white">{resource.title}</h5>
-                <p className="text-sm text-gray-400 line-clamp-2">
-                  {resource.description}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {resource.type} • {resource.category} • {resource.is_external ? 'External' : 'Internal'}
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <a
-                  href={resource.link}
-                  target={resource.is_external ? "_blank" : "_self"}
-                  rel={resource.is_external ? "noopener noreferrer" : ""}
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
-                >
-                  View
-                </a>
-                <button
-                  onClick={() => handleEdit(resource)}
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(resource)}
                   className="text-red-400 hover:text-red-300 transition-colors"
                 >
                   Delete
