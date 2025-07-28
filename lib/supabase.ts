@@ -76,6 +76,28 @@ export interface Mentee {
   created_at: string;
 }
 
+export interface Event {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  participants: string;
+  link: string;
+  status: string;
+  created_at: string;
+}
+
+export interface Resource {
+  id: string;
+  title: string;
+  description: string;
+  link: string;
+  type: string;
+  category: string;
+  is_external: boolean;
+  created_at: string;
+}
+
 // Database functions
 export const mentorService = {
   async authenticate(mentorId: string, password: string): Promise<Mentor | null> {
@@ -381,5 +403,157 @@ export const feedbackService = {
     }
 
     return data;
+  }
+};
+
+export const eventService = {
+  async getAll(): Promise<Event[]> {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async getUpcoming(): Promise<Event[]> {
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'upcoming')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching upcoming events:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async create(event: Omit<Event, 'id' | 'created_at'>): Promise<Event | null> {
+    const { data, error } = await supabase
+      .from('events')
+      .insert([event])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating event:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async update(id: string, updates: Partial<Event>): Promise<Event | null> {
+    const { data, error } = await supabase
+      .from('events')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating event:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting event:', error);
+      return false;
+    }
+
+    return true;
+  }
+};
+
+export const resourceService = {
+  async getAll(): Promise<Resource[]> {
+    const { data, error } = await supabase
+      .from('resources')
+      .select('*')
+      .order('category', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching resources:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async getByCategory(category: string): Promise<Resource[]> {
+    const { data, error } = await supabase
+      .from('resources')
+      .select('*')
+      .eq('category', category)
+      .order('title', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching resources by category:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async create(resource: Omit<Resource, 'id' | 'created_at'>): Promise<Resource | null> {
+    const { data, error } = await supabase
+      .from('resources')
+      .insert([resource])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating resource:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async update(id: string, updates: Partial<Resource>): Promise<Resource | null> {
+    const { data, error } = await supabase
+      .from('resources')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating resource:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting resource:', error);
+      return false;
+    }
+
+    return true;
   }
 };

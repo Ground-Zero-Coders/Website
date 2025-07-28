@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Shield, User, Lock, Eye, EyeOff, ExternalLink, Menu, X } from 'lucide-react';
 import { mentorService, projectService, menteeService, type Mentor, type Project, type Mentee } from '@/lib/supabase';
-import { mentorResources, type Resource } from '@/data/resources';
+import { resourceService, type Resource } from '@/lib/supabase';
+
+
 import Navbar from '@/components/navbar'; 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -874,6 +876,23 @@ function AddProjectContent({ mentor }: { mentor: Mentor }) {
 // Resources Content
 function ResourcesContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const data = await resourceService.getAll();
+        setResources(data);
+      } catch (error) {
+        console.error('Error fetching resources:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResources();
+  }, []);
   
   const categories = [
     { id: 'all', label: 'All Resources' },
@@ -886,9 +905,16 @@ function ResourcesContent() {
   ];
 
   const filteredResources = selectedCategory === 'all' 
-    ? mentorResources 
-    : mentorResources.filter(resource => resource.category === selectedCategory);
+    ? resources 
+    : resources.filter(resource => resource.category === selectedCategory);
 
+  if (loading) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-white/70">Loading resources...</p>
+      </div>
+    );
+  }
 return (
   <div className="space-y-6">
     {/* Category Filter */}
@@ -934,8 +960,8 @@ return (
             </span>
             <a
               href={resource.link}
-              target="_blank"
-              rel="noopener noreferrer"
+              target={resource.is_external ? "_blank" : "_self"}
+              rel={resource.is_external ? "noopener noreferrer" : ""}
               className="bg-[#14b8a6] text-white px-4 py-2 rounded-lg hover:scale-105 transition-all duration-300 flex items-center space-x-2 text-sm font-medium shadow-sm hover:shadow-md"
             >
               <span className="hidden sm:inline">Open</span>

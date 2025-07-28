@@ -1,35 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin, Users, ExternalLink,Building2 } from 'lucide-react';
-
-const upcomingEvents = [
-  {
-    title: 'Code Veda Hackathon',
-    date: 'Coming Soon',
-    location: 'Online/Offline',
-    participants: 'External',
-    link: 'https://vision.hack2skill.com/event/codeveda/?utm_source=google.com&utm_medium=Referral&utm_campaign=RevantJain'
-  },
-  {
-    title: 'Ideathon',
-    date: 'Coming Soon',
-    location: 'Online',
-    participants: 'Internal',
-    link: '#'
-  },
-  {
-    title: 'Quiz Challenge',
-    date: 'Coming Soon',
-    location: 'Online',
-    participants: 'Internal',
-    link: '#'
-  }
-];
-
+import { eventService, type Event } from '@/lib/supabase';
 
 export default function HeroSection() {
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,6 +17,21 @@ export default function HeroSection() {
     name: '',
     email: '',
   });
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const events = await eventService.getUpcoming();
+        setUpcomingEvents(events);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setEventsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -109,7 +103,16 @@ export default function HeroSection() {
             </div>
 
             <div className="space-y-4 lg:space-y-6">
-              {upcomingEvents.map((event, index) => (
+              {eventsLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-muted">Loading events...</p>
+                </div>
+              ) : upcomingEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted">No upcoming events at the moment.</p>
+                </div>
+              ) : (
+                upcomingEvents.map((event, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
@@ -131,7 +134,7 @@ export default function HeroSection() {
                     </div>
                     <div className="flex items-center space-x-2 text-sm sm:text-base">
                       <Building2 className="h-5 w-5 text-green-500" />
-                      <span>{event.participants} Event</span>
+                      <span>{event.participants}</span>
                     </div>
                   </div>
 
@@ -150,7 +153,8 @@ export default function HeroSection() {
 
 
                 </motion.div>
-              ))}
+                ))
+              )}
             </div>
           </motion.div>
 
