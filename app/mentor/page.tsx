@@ -970,12 +970,10 @@ function ResourcesContent() {
   
   const categories = [
     { id: 'all', label: 'All Resources' },
-    { id: 'guidelines', label: 'Guidelines' },
-    { id: 'templates', label: 'Templates' },
-    { id: 'assessment', label: 'Assessment' },
-    { id: 'tech-stack', label: 'Tech Stack' },
-    { id: 'training', label: 'Training' },
-    { id: 'tools', label: 'Tools' }
+    { id: 'Tech', label: 'Tech' },
+    { id: 'Roadmaps', label: 'Roadmaps' },
+    { id: 'Problem Statements', label: 'Problem Statements' },
+
   ];
 
   const filteredResources = selectedCategory === 'all' 
