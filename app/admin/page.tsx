@@ -832,7 +832,7 @@ const [formData, setFormData] = useState({
         
         // Initialize all groups as expanded
         const initialExpanded = Object.keys(grouped).reduce((acc, groupName) => {
-          acc[groupName] = true;
+          acc[groupName] = false;
           return acc;
         }, {} as {[key: string]: boolean});
         setExpandedGroups(initialExpanded);
@@ -1089,7 +1089,10 @@ const resetForm = () => {
           </div>
         ) : (
           <div className="space-y-4 max-h-96 overflow-y-auto">
-            {Object.entries(groupedMentees).map(([groupName, groupMentees]) => (
+            {Object.entries(groupedMentees)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([groupName, groupMentees]) => (
+
               <div key={groupName} className="bg-gray-800/30 rounded-xl overflow-hidden border border-gray-700">
                 {/* Group Header */}
                 <button
