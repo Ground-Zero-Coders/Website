@@ -378,7 +378,7 @@ function TeamsContent({ mentor }: { mentor: Mentor }) {
         // Initialize all groups as expanded
         const groups = data.reduce((acc, mentee) => {
           const groupName = mentee.group_name || 'Unassigned';
-          acc[groupName] = true;
+          acc[groupName] = false;
           return acc;
         }, {} as {[key: string]: boolean});
         setExpandedGroups(groups);
@@ -433,7 +433,10 @@ function TeamsContent({ mentor }: { mentor: Mentor }) {
         </div>
       ) : (
         <div className="space-y-4">
-          {Object.entries(groupedMentees).map(([groupName, groupMentees]) => (
+          {Object.entries(groupedMentees)
+  .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+  .map(([groupName, groupMentees]) => (
+
             <div key={groupName} className="bg-gray-900/50 rounded-xl border border-gray-700 overflow-hidden">
               {/* Group Header */}
               <button
