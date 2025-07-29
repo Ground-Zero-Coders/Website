@@ -789,6 +789,8 @@ function ProjectManagerContent() {
 // Mentee Manager Content
 function MenteeManagerContent() {
   const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [groupedMentees, setGroupedMentees] = useState<{[key: string]: Mentee[]}>({});
+  const [expandedGroups, setExpandedGroups] = useState<{[key: string]: boolean}>({});
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -815,6 +817,25 @@ const [formData, setFormData] = useState({
         ]);
         setMentees(menteesData);
         setMentors(mentorsData);
+        
+        // Group mentees by group_name
+        const grouped = menteesData.reduce((acc, mentee) => {
+          const groupName = mentee.group_name || 'Unassigned';
+          if (!acc[groupName]) {
+            acc[groupName] = [];
+          }
+          acc[groupName].push(mentee);
+          return acc;
+        }, {} as {[key: string]: Mentee[]});
+        
+        setGroupedMentees(grouped);
+        
+        // Initialize all groups as expanded
+        const initialExpanded = Object.keys(grouped).reduce((acc, groupName) => {
+          acc[groupName] = true;
+          return acc;
+        }, {} as {[key: string]: boolean});
+        setExpandedGroups(initialExpanded);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -824,6 +845,13 @@ const [formData, setFormData] = useState({
 
     fetchData();
   }, []);
+
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1054,49 +1082,92 @@ const resetForm = () => {
         <h4 className="font-space-grotesk text-lg font-semibold text-white mb-4">
           All Mentees ({mentees.length})
         </h4>
-        <div className="space-y-4 max-h-96 overflow-y-auto">
-          {mentees.map((mentee) => (
-            <div key={mentee.id} className="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                  <span className="text-cyan-400 font-semibold">
-                    {mentee.name.charAt(0)}
-                  </span>
-                </div>
-                <div>
-                  <h5 className="font-semibold text-white">{mentee.name}</h5>
-                  <p className="text-sm text-gray-400">
-                    {mentee.domain || 'No domain'} • {mentee.mentor_name || 'No mentor assigned'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {mentee.group_name || 'No group'} • {new Date(mentee.join_date).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  mentee.status === 'active' ? 'bg-green-100 text-green-800' :
-                  mentee.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {mentee.status}
-                </span>
+        
+        {Object.keys(groupedMentees).length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No mentees found.</p>
+          </div>
+        ) : (
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {Object.entries(groupedMentees).map(([groupName, groupMentees]) => (
+              <div key={groupName} className="bg-gray-800/30 rounded-xl overflow-hidden border border-gray-700">
+                {/* Group Header */}
                 <button
-                  onClick={() => handleEdit(mentee)}
-                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                  onClick={() => toggleGroup(groupName)}
+                  className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-800/50 transition-colors"
                 >
-                  Edit
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                      <span className="text-cyan-400 font-semibold">
+                        {groupName.charAt(0)}
+                      </span>
+                    </div>
+                    <div className="text-left">
+                      <h5 className="font-space-grotesk font-semibold text-white text-lg">
+                        {groupName}
+                      </h5>
+                      <p className="text-sm text-gray-400">
+                        {groupMentees.length} member{groupMentees.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-gray-400">
+                    {expandedGroups[groupName] ? '▼' : '▶'}
+                  </div>
                 </button>
-                <button
-                  onClick={() => handleDelete(mentee)}
-                  className="text-red-400 hover:text-red-300 transition-colors"
-                >
-                  Delete
-                </button>
+
+                {/* Group Members */}
+                {expandedGroups[groupName] && (
+                  <div className="border-t border-gray-700">
+                    <div className="space-y-2 p-4">
+                      {groupMentees.map((mentee) => (
+                        <div key={mentee.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800/70 transition-colors">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                              <span className="text-cyan-400 font-semibold text-sm">
+                                {mentee.name.charAt(0)}
+                              </span>
+                            </div>
+                            <div>
+                              <h6 className="font-semibold text-white text-sm">{mentee.name}</h6>
+                              <p className="text-xs text-gray-400">
+                                {mentee.domain || 'No domain'} • {mentee.mentor_name || 'No mentor assigned'}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {new Date(mentee.join_date).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              mentee.status === 'active' ? 'bg-green-500/10 text-green-300' :
+                              mentee.status === 'inactive' ? 'bg-red-500/10 text-red-300' :
+                              'bg-blue-500/10 text-blue-300'
+                            }`}>
+                              {mentee.status}
+                            </span>
+                            <button
+                              onClick={() => handleEdit(mentee)}
+                              className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(mentee)}
+                              className="text-red-400 hover:text-red-300 transition-colors text-sm"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -367,12 +367,21 @@ function DashboardContent({ mentor }: { mentor: Mentor }) {
 function TeamsContent({ mentor }: { mentor: Mentor }) {
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedGroups, setExpandedGroups] = useState<{[key: string]: boolean}>({});
 
   useEffect(() => {
     const fetchMentees = async () => {
       try {
         const data = await menteeService.getByMentorId(mentor.id);
         setMentees(data);
+        
+        // Initialize all groups as expanded
+        const groups = data.reduce((acc, mentee) => {
+          const groupName = mentee.group_name || 'Unassigned';
+          acc[groupName] = true;
+          return acc;
+        }, {} as {[key: string]: boolean});
+        setExpandedGroups(groups);
       } catch (error) {
         console.error('Error fetching mentees:', error);
       } finally {
@@ -383,6 +392,22 @@ function TeamsContent({ mentor }: { mentor: Mentor }) {
     fetchMentees();
   }, [mentor.id]);
 
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  // Group mentees by group_name
+  const groupedMentees = mentees.reduce((acc, mentee) => {
+    const groupName = mentee.group_name || 'Unassigned';
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push(mentee);
+    return acc;
+  }, {} as {[key: string]: Mentee[]});
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -391,65 +416,111 @@ function TeamsContent({ mentor }: { mentor: Mentor }) {
     );
   }
 
- return (
-  <div className="space-y-6">
-    <div className="flex items-center justify-between">
-      <h3 className="font-space-grotesk text-xl font-semibold text-white">
-        My Mentees ({mentees.length})
-      </h3>
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="font-space-grotesk text-xl font-semibold text-white">
+          My Mentees ({mentees.length})
+        </h3>
+        <div className="text-sm text-white/60">
+          {Object.keys(groupedMentees).length} Group{Object.keys(groupedMentees).length !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      {mentees.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-white/70">No mentees assigned yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(groupedMentees).map(([groupName, groupMentees]) => (
+            <div key={groupName} className="bg-gray-900/50 rounded-xl border border-gray-700 overflow-hidden">
+              {/* Group Header */}
+              <button
+                onClick={() => toggleGroup(groupName)}
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-800/50 transition-colors"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-10 h-10 bg-[#14b8a6]/20 rounded-full flex items-center justify-center">
+                    <span className="text-[#14b8a6] font-semibold text-lg">
+                      {groupName.charAt(0)}
+                    </span>
+                  </div>
+                  <div className="text-left">
+                    <h4 className="font-space-grotesk font-semibold text-white text-lg">
+                      {groupName}
+                    </h4>
+                    <p className="text-sm text-white/60">
+                      {groupMentees.length} member{groupMentees.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-white/60">
+                  {expandedGroups[groupName] ? (
+                    <svg className="w-5 h-5 transform rotate-180 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+
+              {/* Group Members */}
+              {expandedGroups[groupName] && (
+                <div className="border-t border-gray-700 p-6">
+                  <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {groupMentees.map((mentee) => (
+                      <div
+                        key={mentee.id}
+                        className="bg-gray-800/50 p-4 rounded-lg border border-gray-600 hover:border-[#14b8a6]/30 transition-colors"
+                      >
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className="w-10 h-10 bg-[#14b8a6]/10 rounded-full flex items-center justify-center">
+                            <span className="text-[#14b8a6] font-semibold">
+                              {mentee.name.charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="font-space-grotesk font-semibold text-white text-sm">
+                              {mentee.name}
+                            </h5>
+                            <p className="text-xs text-white/60">{mentee.domain || 'No domain'}</p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1 text-xs text-white/80">
+                          <p className="truncate"><strong>Email:</strong> {mentee.email}</p>
+                          <p><strong>GitHub:</strong> {mentee.github_id || 'Not provided'}</p>
+                          <p><strong>Joined:</strong> {new Date(mentee.join_date).toLocaleDateString()}</p>
+                          <div className="flex items-center justify-between pt-2">
+                            <span className="text-xs font-medium text-white/70">Status:</span>
+                            <span
+                              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                mentee.status === 'active'
+                                  ? 'bg-green-500/20 text-green-300'
+                                  : mentee.status === 'inactive'
+                                  ? 'bg-red-500/20 text-red-300'
+                                  : 'bg-blue-500/20 text-blue-300'
+                              }`}
+                            >
+                              {mentee.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-
-    {mentees.length === 0 ? (
-      <div className="text-center py-12">
-        <p className="text-white/70">No mentees assigned yet.</p>
-      </div>
-    ) : (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mentees.map((mentee) => (
-          <div
-            key={mentee.id}
-            className="bg-gray-900 p-6 rounded-xl border border-gray-700 text-white"
-          >
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-12 h-12 bg-[#14b8a6]/10 rounded-full flex items-center justify-center">
-                <span className="text-[#14b8a6] font-semibold text-lg">
-                  {mentee.name.charAt(0)}
-                </span>
-              </div>
-              <div>
-                <h4 className="font-space-grotesk font-semibold text-white">
-                  {mentee.name}
-                </h4>
-                <p className="text-sm text-white/60">{mentee.domain}</p>
-              </div>
-            </div>
-
-            <div className="space-y-2 text-sm text-white/90">
-              <p><strong>Email:</strong> {mentee.email}</p>
-              <p><strong>Group:</strong> {mentee.group_name || 'Not assigned'}</p>
-              <p><strong>GitHub:</strong> {mentee.github_id || 'Not provided'}</p>
-              <p><strong>Join Date:</strong> {new Date(mentee.join_date).toLocaleDateString()}</p>
-              <p className="flex items-center">
-                <strong>Status:</strong>
-                <span
-                  className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                    mentee.status === 'active'
-                      ? 'bg-green-500/10 text-green-300'
-                      : mentee.status === 'inactive'
-                      ? 'bg-red-500/10 text-red-300'
-                      : 'bg-blue-500/10 text-blue-300'
-                  }`}
-                >
-                  {mentee.status}
-                </span>
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+  );
 }
 
 // Projects Content
