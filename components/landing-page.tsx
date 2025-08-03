@@ -10,7 +10,7 @@ const terminalLines = [
   { command: '$ whoami', output: 'ground-zero-coders' },
   
   { command: '$ cat about.txt', output: 'Premier tech organization ' },
-  { command: '$ grep -r "members" stats/', output: '550+ active developers & designers' },
+  { command: '$ grep -r "members" stats/', output: '600+ active developers & designers' },
 
 ];
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
   }, [displayedText, currentLineIndex]);
 
   const stats = [
-    { label: 'Active Members', value: '550+', icon: Users },
+    { label: 'Active Members', value: '600+', icon: Users },
     { label: 'Projects Completed', value: `${projectCount}+`, icon: Code },
     { label: 'Hackathons Organized', value: '5+', icon: Trophy },
   ];
@@ -116,7 +116,7 @@ export default function LandingPage() {
 >
   {[
     "Premier tech organization since June 2025",
-    "550+ active developers and designers",
+    "600+ active developers and designers",
     `${projectCount}+ innovative projects completed`,
     "5+ hackathons participations by teams",
   ].map((item, i) => (
