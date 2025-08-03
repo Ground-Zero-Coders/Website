@@ -98,6 +98,15 @@ export interface Resource {
   created_at: string;
 }
 
+export interface Achiever {
+  id: string;
+  event_name: string;
+  winner_name: string;
+  winner_photo?: string;
+  position: number;
+  created_at: string;
+}
+
 // Database functions
 export const mentorService = {
   async authenticate(mentorId: string, password: string): Promise<Mentor | null> {
@@ -551,6 +560,99 @@ export const resourceService = {
 
     if (error) {
       console.error('Error deleting resource:', error);
+      return false;
+    }
+
+    return true;
+  }
+};
+
+export const achieverService = {
+  async getAll(): Promise<Achiever[]> {
+    const { data, error } = await supabase
+      .from('achievers')
+      .select('*')
+      .order('event_name', { ascending: true })
+      .order('position', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching achievers:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async getUniqueEvents(): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('achievers')
+      .select('event_name')
+      .order('event_name', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching unique events:', error);
+      return [];
+    }
+
+    const uniqueEvents = Array.from(new Set(data?.map(item => item.event_name) || []));
+
+    return uniqueEvents;
+  },
+
+  async getByEvent(eventName: string): Promise<Achiever[]> {
+    const { data, error } = await supabase
+      .from('achievers')
+      .select('*')
+      .eq('event_name', eventName)
+      .order('position', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching achievers by event:', error);
+      return [];
+    }
+
+    return data || [];
+  },
+
+  async create(achiever: Omit<Achiever, 'id' | 'created_at'>): Promise<Achiever | null> {
+    const { data, error } = await supabase
+      .from('achievers')
+      .insert([achiever])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating achiever:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async update(id: string, updates: Partial<Achiever>): Promise<Achiever | null> {
+    const { data, error } = await supabase
+      .from('achievers')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating achiever:', error);
+      return null;
+    }
+
+    return data;
+  },
+
+  async delete(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('achievers')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting achiever:', error);
       return false;
     }
 

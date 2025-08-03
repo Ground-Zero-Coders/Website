@@ -8,6 +8,7 @@ import TopPerformersSection from '@/components/top-performers-section';
 import ProjectsPreview from '@/components/projects-preview';
 import Footer from '@/components/footer';
 import { Analytics } from "@vercel/analytics/next"
+import AchieversSection from '@/components/achievers-section';
 
 
 
@@ -19,12 +20,14 @@ export default function Home() {
       <Analytics />
       <Navbar />
       <LandingPage />
+      <AchieversSection />
       <HeroSection />
       <AboutSection />
       
       <CoreTeamSection />
       <TopPerformersSection />
       <ProjectsPreview />
+      
       <Footer />
     </main>
   );
